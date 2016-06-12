@@ -12,7 +12,7 @@ export POSTGRES_DB=users
 
 - Start a `postgres` container
 
-```consle
+```console
 docker run -d --name=pq \
     -p 5432:5432 \
     -e POSTGRES_USER=$POSTGRES_USER \
