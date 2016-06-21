@@ -77,6 +77,8 @@ func main() {
 	}
 	defer db.Close()
 
+	// Generate Schema
+	log.Println("Generate DB Schema...")
 	if _, err := db.Exec(schema); err != nil {
 		log.Println(err)
 	}
