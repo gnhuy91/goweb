@@ -27,3 +27,9 @@ docker run -d --name=pq \
 ```console
 go run main.go
 ```
+
+- Building
+
+```console
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
+```
