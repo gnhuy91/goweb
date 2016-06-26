@@ -28,7 +28,7 @@ docker run -d --name=pq \
 go run main.go
 ```
 
-- Building
+- Building (for *alpine*)
 
 ```console
 GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
