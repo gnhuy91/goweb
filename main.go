@@ -83,17 +83,10 @@ func main() {
 		log.Println(err)
 	}
 
-	mydb := &DB{db}
-
-	// mydb, err := Connect("postgres", dsn+"?sslmode=disable")
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// defer mydb.Close()
-
 	// Create our logger
 	logger := log.New(os.Stdout, "", 0)
 
+	mydb := &DB{db}
 	r := mux.NewRouter()
 
 	// my version of 'HTTP closure'
@@ -144,24 +137,6 @@ func (db *DB) UserList() http.Handler {
 			return
 		}
 	})
-}
-
-// Open returns a DB reference for a data source.
-func Open(dataDriver, dataSourceName string) (*DB, error) {
-	db, err := sqlx.Open(dataDriver, dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-	return &DB{db}, nil
-}
-
-// Connect returns a DB reference for a data source.
-func Connect(dataDriver, dataSourceName string) (*DB, error) {
-	db, err := sqlx.Connect(dataDriver, dataSourceName)
-	if err != nil {
-		return nil, err
-	}
-	return &DB{db}, nil
 }
 
 // Beginx starts an returns a new transaction.
