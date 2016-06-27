@@ -139,7 +139,7 @@ func (db *DB) UserList() http.Handler {
 	})
 }
 
-// Beginx starts an returns a new transaction.
+// Beginx starts and returns a new transaction
 func (db *DB) Beginx() (*Tx, error) {
 	tx, err := db.DB.Beginx()
 	if err != nil {
