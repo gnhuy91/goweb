@@ -13,7 +13,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
-	"goweb/dbwrapper"
 	"goweb/handlers"
 )
 
@@ -31,8 +30,6 @@ CREATE TABLE place (
 	city text NULL,
 	telcode integer
 )`
-
-type DB dbwrapper.DB
 
 func main() {
 	postgresHost := os.Getenv("POSTGRES_HOST")
@@ -62,7 +59,7 @@ func main() {
 	// Create our logger
 	logger := log.New(os.Stdout, "", 0)
 
-	// mydb := &DB{db}
+	mydb := &handlers.DB{DB: db}
 	r := mux.NewRouter()
 
 	// my version of 'HTTP closure'
@@ -73,11 +70,11 @@ func main() {
 	// hanlder with no closure
 	r.HandleFunc("/about", handlers.About)
 
-	// r.Handle("/users", mydb.UserList()).Methods("GET", "HEAD")
-	// r.Handle("/user/{name}", mydb.UserHandler())
-	// r.Handle("/gendata", mydb.GenDataHandler()).Methods("GET")
+	r.Handle("/users", mydb.UserList()).Methods("GET", "HEAD")
+	r.Handle("/user/{name}", mydb.UserHandler())
+	r.Handle("/gendata", mydb.GenDataHandler()).Methods("GET")
 
-	// r.Handle("/_user/{name}", withMetrics(logger, userHandler()))
+	r.Handle("/_user/{name}", handlers.WithMetrics(logger, mydb.UserHandler()))
 
 	http.ListenAndServe(":8080", r)
 }
