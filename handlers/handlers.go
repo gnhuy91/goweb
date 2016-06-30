@@ -7,24 +7,14 @@ import (
 	"net/http"
 	"time"
 
-	"goweb/dbwrapper"
 	"goweb/models"
 	"goweb/transactions"
 
 	"github.com/gorilla/mux"
 )
 
-type DB dbwrapper.DB
-
-// type Tx transactions.Tx
-
-// Beginx starts and returns a new transaction
-func (db *DB) Beginx() (*transactions.Tx, error) {
-	tx, err := db.DB.Beginx()
-	if err != nil {
-		return nil, err
-	}
-	return &transactions.Tx{Tx: tx}, nil
+type DB struct {
+	*transactions.DB
 }
 
 func (db *DB) UserHandler() http.Handler {
@@ -32,7 +22,7 @@ func (db *DB) UserHandler() http.Handler {
 		vars := mux.Vars(r)
 		name := vars["name"]
 
-		tx, err := db.Beginx()
+		tx, err := db.Begin()
 		if err != nil {
 			log.Println(err)
 		}
@@ -62,7 +52,7 @@ func (db *DB) UserList() http.Handler {
 
 func (db *DB) GenDataHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tx, err := db.Beginx()
+		tx, err := db.Begin()
 		if err != nil {
 			log.Println(err)
 		}

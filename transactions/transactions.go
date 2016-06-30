@@ -6,7 +6,16 @@ import (
 	"goweb/models"
 )
 
+type DB dbwrapper.DB
 type Tx dbwrapper.Tx
+
+func (db *DB) Begin() (*Tx, error) {
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return nil, err
+	}
+	return &Tx{tx}, nil
+}
 
 func (tx *Tx) GenerateData() {
 	tx.MustExec("INSERT INTO person (first_name, last_name, email) VALUES ($1, $2, $3)", "Jason", "Moiron", "jmoiron@jmoiron.net")

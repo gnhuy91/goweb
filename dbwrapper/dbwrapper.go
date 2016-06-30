@@ -11,12 +11,3 @@ type DB struct {
 type Tx struct {
 	*sqlx.Tx
 }
-
-// // Beginx starts and returns a new transaction
-// func (db *DB) Beginx() (*Tx, error) {
-// 	tx, err := db.DB.Beginx()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &Tx{tx}, nil
-// }
