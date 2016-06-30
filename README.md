@@ -2,6 +2,11 @@
 
 ## Instruction
 
+- Install dependencies
+```console
+glide install
+```
+
 - Prepare env
 
 ```sh
