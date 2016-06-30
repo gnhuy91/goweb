@@ -2,6 +2,11 @@
 
 ## Instruction
 
+- Install dependencies
+```console
+glide install
+```
+
 - Prepare env
 
 ```sh
@@ -14,7 +19,7 @@ export POSTGRES_DB=users
 - Start a `postgres` container
 
 ```console
-docker run -d --name=pq \
+docker run -d --name=pg \
     -p 5432:5432 \
     -e POSTGRES_USER=$POSTGRES_USER \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
