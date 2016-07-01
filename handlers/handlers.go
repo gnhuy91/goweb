@@ -33,15 +33,15 @@ func (db *DB) UserHandler() http.Handler {
 		if err != nil {
 			log.Println(err)
 		}
-		tx.CreatePerson(&models.Person{FirstName: name})
+		tx.CreateUser(&models.User{FirstName: name})
 		tx.Commit()
 	})
 }
 
 func (db *DB) UserList() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var users []models.Person
-		err := db.Select(&users, "SELECT * FROM person")
+		var users []models.User
+		err := db.Select(&users, "SELECT * FROM user_info")
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), 500)
