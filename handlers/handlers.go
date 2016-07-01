@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,19 +10,20 @@ import (
 
 	"goweb/dbwrapper"
 	"goweb/models"
-	"goweb/transactions"
 
 	"github.com/gorilla/mux"
 )
 
 type DB dbwrapper.DB
 
-func (db *DB) Begin() (*transactions.Tx, error) {
+type Tx dbwrapper.Tx
+
+func (db *DB) Begin() (*Tx, error) {
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return nil, err
 	}
-	return &transactions.Tx{Tx: tx}, nil
+	return &Tx{tx}, nil
 }
 
 func (db *DB) UserHandler() http.Handler {
@@ -40,8 +42,7 @@ func (db *DB) UserHandler() http.Handler {
 
 func (db *DB) UserList() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var users []models.User
-		err := db.Select(&users, "SELECT * FROM user_info")
+		users, err := db.GetUsers()
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), 500)
@@ -68,6 +69,35 @@ func (db *DB) GenDataHandler() http.Handler {
 			log.Println(err)
 		}
 	})
+}
+
+func (tx *Tx) GenerateData() {
+	tx.MustExec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", "Jason", "Moiron", "jmoiron@jmoiron.net")
+	tx.MustExec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", "John", "Doe", "johndoeDNE@gmail.net")
+	tx.MustExec("INSERT INTO place (country, city, telcode) VALUES ($1, $2, $3)", "United States", "New York", "1")
+	tx.MustExec("INSERT INTO place (country, telcode) VALUES ($1, $2)", "Hong Kong", "852")
+	tx.MustExec("INSERT INTO place (country, telcode) VALUES ($1, $2)", "Singapore", "65")
+	// Named queries can use structs, so if you have an existing struct (i.e. user := &User{}) that you have populated, you can pass it in as &user
+	// _, err := tx.NamedExec("INSERT INTO user_info (first_name, last_name, email) VALUES (:first_name, :last_name, :email) RETURNING id", &User{"Jane", "Citizen", "jane.citzen@example.com"})
+	// if err != nil {
+	// 	log.Println(err)
+	// }
+}
+
+// CreateUser create a user in the db
+func (tx *Tx) CreateUser(m *models.User) error {
+	// Validate the input
+	if m == nil {
+		return errors.New("user required")
+	}
+	_, err := tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", m.FirstName, m.LastName, m.Email)
+	return err
+}
+
+func (db *DB) GetUsers() ([]models.User, error) {
+	var users []models.User
+	err := db.Select(&users, "SELECT * FROM user_info")
+	return users, err
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!
