@@ -94,8 +94,8 @@ func (tx *Tx) CreateUser(m *models.User) error {
 	return err
 }
 
-func (db *DB) GetUsers() ([]models.User, error) {
-	var users []models.User
+func (db *DB) GetUsers() ([]*models.User, error) {
+	var users []*models.User
 	err := db.Select(&users, "SELECT * FROM user_info")
 	return users, err
 }
