@@ -7,14 +7,21 @@ import (
 	"net/http"
 	"time"
 
+	"goweb/dbwrapper"
 	"goweb/models"
 	"goweb/transactions"
 
 	"github.com/gorilla/mux"
 )
 
-type DB struct {
-	*transactions.DB
+type DB dbwrapper.DB
+
+func (db *DB) Begin() (*transactions.Tx, error) {
+	tx, err := db.DB.Beginx()
+	if err != nil {
+		return nil, err
+	}
+	return &transactions.Tx{Tx: tx}, nil
 }
 
 func (db *DB) UserHandler() http.Handler {
