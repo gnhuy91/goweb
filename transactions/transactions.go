@@ -22,11 +22,11 @@ func (tx *Tx) GenerateData() {
 }
 
 // CreateUser create a user in the db
-func (tx *Tx) CreateUser(p *models.User) error {
+func (tx *Tx) CreateUser(m *models.User) error {
 	// Validate the input
-	if p == nil {
+	if m == nil {
 		return errors.New("user required")
 	}
-	_, err := tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", p.FirstName, p.LastName, p.Email)
+	_, err := tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", m.FirstName, m.LastName, m.Email)
 	return err
 }
