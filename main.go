@@ -10,9 +10,9 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
+	"goweb/dbwrapper"
 	"goweb/handlers"
 )
 
@@ -44,7 +44,7 @@ func main() {
 		postgresHost,
 		os.Getenv("POSTGRES_DB"))
 
-	db, err := sqlx.Connect("postgres", dsn+"?sslmode=disable")
+	db, err := dbwrapper.Connect("postgres", dsn+"?sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -59,7 +59,7 @@ func main() {
 	// Create our logger
 	logger := log.New(os.Stdout, "", 0)
 
-	mydb := &handlers.DB{DB: db}
+	mydb := &handlers.DB{DB: db.DB}
 	r := mux.NewRouter()
 
 	// my version of 'HTTP closure'
