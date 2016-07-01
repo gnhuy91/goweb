@@ -10,9 +10,9 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 
+	"goweb/dbwrapper"
 	"goweb/handlers"
 )
 
@@ -44,7 +44,7 @@ func main() {
 		postgresHost,
 		os.Getenv("POSTGRES_DB"))
 
-	db, err := sqlx.Connect("postgres", dsn+"?sslmode=disable")
+	db, err := dbwrapper.Connect("postgres", dsn+"?sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -59,7 +59,7 @@ func main() {
 	// Create our logger
 	logger := log.New(os.Stdout, "", 0)
 
-	mydb := &handlers.DB{DB: db}
+	hDB := &handlers.DB{DB: db.DB}
 	r := mux.NewRouter()
 
 	// my version of 'HTTP closure'
@@ -70,11 +70,11 @@ func main() {
 	// hanlder with no closure
 	r.HandleFunc("/about", handlers.About)
 
-	r.Handle("/users", mydb.UserList()).Methods("GET", "HEAD")
-	r.Handle("/user/{name}", mydb.UserHandler())
-	r.Handle("/gendata", mydb.GenDataHandler()).Methods("GET")
+	r.Handle("/users", hDB.UserList()).Methods("GET", "HEAD")
+	r.Handle("/user/{name}", hDB.UserHandler())
+	r.Handle("/gendata", hDB.GenDataHandler()).Methods("GET")
 
-	r.Handle("/_user/{name}", handlers.WithMetrics(logger, mydb.UserHandler()))
+	r.Handle("/_user/{name}", handlers.WithMetrics(logger, hDB.UserHandler()))
 
 	http.ListenAndServe(":8080", r)
 }

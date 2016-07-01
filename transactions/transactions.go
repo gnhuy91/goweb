@@ -21,7 +21,7 @@ func (tx *Tx) GenerateData() {
 	// }
 }
 
-// CreatePerson create a fucking person
+// CreatePerson create a person in the db
 func (tx *Tx) CreatePerson(p *models.Person) error {
 	// Validate the input
 	if p == nil {

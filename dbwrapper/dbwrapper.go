@@ -12,11 +12,20 @@ type Tx struct {
 	*sqlx.Tx
 }
 
-// // Beginx starts and returns a new transaction
-// func (db *DB) Beginx() (*Tx, error) {
-// 	tx, err := db.DB.Beginx()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return &Tx{tx}, nil
-// }
+// Open returns a DB reference for a data source.
+func Open(dataDriver, dataSourceName string) (*DB, error) {
+	db, err := sqlx.Open(dataDriver, dataSourceName)
+	if err != nil {
+		return nil, err
+	}
+	return &DB{db}, nil
+}
+
+// Connect returns a DB reference for a data source.
+func Connect(dataDriver, dataSourceName string) (*DB, error) {
+	db, err := sqlx.Connect(dataDriver, dataSourceName)
+	if err != nil {
+		return nil, err
+	}
+	return &DB{db}, nil
+}

@@ -16,10 +16,7 @@ import (
 
 type DB dbwrapper.DB
 
-// type Tx transactions.Tx
-
-// Beginx starts and returns a new transaction
-func (db *DB) Beginx() (*transactions.Tx, error) {
+func (db *DB) Begin() (*transactions.Tx, error) {
 	tx, err := db.DB.Beginx()
 	if err != nil {
 		return nil, err
@@ -32,7 +29,7 @@ func (db *DB) UserHandler() http.Handler {
 		vars := mux.Vars(r)
 		name := vars["name"]
 
-		tx, err := db.Beginx()
+		tx, err := db.Begin()
 		if err != nil {
 			log.Println(err)
 		}
@@ -62,7 +59,7 @@ func (db *DB) UserList() http.Handler {
 
 func (db *DB) GenDataHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		tx, err := db.Beginx()
+		tx, err := db.Begin()
 		if err != nil {
 			log.Println(err)
 		}
