@@ -17,7 +17,7 @@ import (
 )
 
 var schema = `
-CREATE TABLE person (
+CREATE TABLE user_info (
 	id BIGSERIAL PRIMARY KEY,
 	first_name text,
 	last_name text,
