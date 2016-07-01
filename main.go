@@ -76,5 +76,5 @@ func main() {
 
 	r.Handle("/_user/{name}", handlers.WithMetrics(logger, hDB.UserHandler()))
 
-	http.ListenAndServe(":8080", r)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
