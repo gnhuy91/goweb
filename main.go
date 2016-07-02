@@ -17,7 +17,7 @@ import (
 )
 
 var schema = `
-CREATE TABLE person (
+CREATE TABLE user_info (
 	id BIGSERIAL PRIMARY KEY,
 	first_name text,
 	last_name text,
@@ -76,5 +76,5 @@ func main() {
 
 	r.Handle("/_user/{name}", handlers.WithMetrics(logger, hDB.UserHandler()))
 
-	http.ListenAndServe(":8080", r)
+	log.Fatal(http.ListenAndServe(":8080", r))
 }
