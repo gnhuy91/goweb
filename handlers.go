@@ -1,4 +1,4 @@
-package handlers
+package main
 
 import (
 	"encoding/json"
@@ -8,18 +8,13 @@ import (
 	"net/http"
 	"time"
 
-	"goweb/dbwrapper"
 	"goweb/models"
 
 	"github.com/gorilla/mux"
 )
 
-type DB dbwrapper.DB
-
-type Tx dbwrapper.Tx
-
 func (db *DB) Begin() (*Tx, error) {
-	tx, err := db.DB.Beginx()
+	tx, err := db.Beginx()
 	if err != nil {
 		return nil, err
 	}
