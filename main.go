@@ -9,7 +9,6 @@ import (
 	_ "net/http/pprof"
 	"os"
 
-	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
 
@@ -57,20 +56,23 @@ func main() {
 	}
 
 	hDB := &DB{db.DB}
-	r := mux.NewRouter()
+	// r := mux.NewRouter()
 
-	// my version of 'HTTP closure'
-	config := "my config"
-	r.HandleFunc("/welcome/{name}", WelcomeHandler(config))
-	r.HandleFunc("/_welcome/{name}", Middleware(logger, WelcomeHandler(config)))
+	// // my version of 'HTTP closure'
+	// config := "my config"
+	// r.HandleFunc("/welcome/{name}", WelcomeHandler(config))
+	// r.HandleFunc("/_welcome/{name}", Middleware(logger, WelcomeHandler(config)))
 
-	// hanlder with no closure
-	r.HandleFunc("/about", About)
+	// // hanlder with no closure
+	// r.HandleFunc("/about", About)
 
-	r.Handle("/users", UserList(hDB)).Methods("GET", "HEAD")
-	r.Handle("/user", UserHandler(hDB)).Methods("POST")
+	// r.Handle("/users", UserList(hDB)).Methods("GET", "HEAD")
+	// r.Handle("/user", UserHandler(hDB)).Methods("POST")
 
-	r.Handle("/gendata", GenDataHandler(hDB)).Methods("GET")
+	// r.Handle("/gendata", GenDataHandler(hDB)).Methods("GET")
 
+	// log.Fatal(http.ListenAndServe(":8080", r))
+
+	r := NewRouter(hDB)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
