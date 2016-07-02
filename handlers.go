@@ -21,7 +21,7 @@ func (db *DB) Begin() (*Tx, error) {
 	return &Tx{tx}, nil
 }
 
-func (db *DB) UserHandler() http.Handler {
+func UserHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		name := vars["name"]
@@ -35,7 +35,7 @@ func (db *DB) UserHandler() http.Handler {
 	})
 }
 
-func (db *DB) UserList() http.Handler {
+func UserList(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		users, err := db.GetUsers()
 		if err != nil {
@@ -53,7 +53,7 @@ func (db *DB) UserList() http.Handler {
 	})
 }
 
-func (db *DB) GenDataHandler() http.Handler {
+func GenDataHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		tx, err := db.Begin()
 		if err != nil {
@@ -113,7 +113,7 @@ func Middleware(l *log.Logger, next func(w http.ResponseWriter, r *http.Request)
 }
 
 // took from the awesome: https://gist.github.com/tsenart/5fc18c659814c078378d
-func UserHandler() http.Handler {
+func MyUserHandler() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		name := vars["name"]

@@ -67,11 +67,12 @@ func main() {
 	// hanlder with no closure
 	r.HandleFunc("/about", About)
 
-	r.Handle("/users", hDB.UserList()).Methods("GET", "HEAD")
-	r.Handle("/user/{name}", hDB.UserHandler())
-	r.Handle("/gendata", hDB.GenDataHandler()).Methods("GET")
+	r.Handle("/users", UserList(hDB)).Methods("GET", "HEAD")
+	r.Handle("/user/{name}", UserHandler(hDB))
 
-	r.Handle("/_user/{name}", WithMetrics(logger, hDB.UserHandler()))
+	r.Handle("/gendata", GenDataHandler(hDB)).Methods("GET")
+
+	r.Handle("/_user/{name}", WithMetrics(logger, UserHandler(hDB)))
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
