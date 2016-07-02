@@ -28,18 +28,18 @@ func UserHandler(db *DB) http.Handler {
 		err := decoder.Decode(&u)
 		if err != nil {
 			log.Println(err)
-			http.Error(w, err.Error(), 400)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		if u == (models.User{}) {
-			http.Error(w, "user is empty", 400)
+			http.Error(w, "user is empty", http.StatusBadRequest)
 			return
 		}
 
 		tx, err := db.Begin()
 		if err != nil {
 			log.Println(err)
-			http.Error(w, err.Error(), 500)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		tx.CreateUser(&u)
@@ -52,14 +52,14 @@ func UserList(db *DB) http.Handler {
 		users, err := db.GetUsers()
 		if err != nil {
 			log.Println(err)
-			http.Error(w, err.Error(), 500)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusOK)
 		if err := json.NewEncoder(w).Encode(users); err != nil {
 			log.Println(err)
-			http.Error(w, err.Error(), 500)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 	})
