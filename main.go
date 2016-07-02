@@ -28,6 +28,9 @@ CREATE TABLE place (
 	telcode integer
 )`
 
+// Create our logger
+var logger = log.New(os.Stdout, "", 0)
+
 func main() {
 	postgresHost := os.Getenv("POSTGRES_HOST")
 	if postgresHost == "" {
@@ -52,9 +55,6 @@ func main() {
 	if _, err := db.Exec(schema); err != nil {
 		log.Println(err)
 	}
-
-	// Create our logger
-	logger := log.New(os.Stdout, "", 0)
 
 	hDB := &DB{db.DB}
 	r := mux.NewRouter()
