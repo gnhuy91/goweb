@@ -68,11 +68,9 @@ func main() {
 	r.HandleFunc("/about", About)
 
 	r.Handle("/users", UserList(hDB)).Methods("GET", "HEAD")
-	r.Handle("/user/{name}", UserHandler(hDB))
+	r.Handle("/user", UserHandler(hDB)).Methods("POST")
 
 	r.Handle("/gendata", GenDataHandler(hDB)).Methods("GET")
-
-	r.Handle("/_user/{name}", WithMetrics(logger, UserHandler(hDB)))
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

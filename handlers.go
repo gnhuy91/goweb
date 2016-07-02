@@ -23,14 +23,26 @@ func (db *DB) Begin() (*Tx, error) {
 
 func UserHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		name := vars["name"]
+		decoder := json.NewDecoder(r.Body)
+		var u models.User
+		err := decoder.Decode(&u)
+		if err != nil {
+			log.Println(err)
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		if u == (models.User{}) {
+			http.Error(w, "user is empty", 400)
+			return
+		}
 
 		tx, err := db.Begin()
 		if err != nil {
 			log.Println(err)
+			http.Error(w, err.Error(), 500)
+			return
 		}
-		tx.CreateUser(&models.User{FirstName: name})
+		tx.CreateUser(&u)
 		tx.Commit()
 	})
 }
