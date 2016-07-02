@@ -30,7 +30,7 @@ docker run -d --name=pg \
 - Run the app
 
 ```console
-go run main.go
+go run *.go
 ```
 
 - Building (for *alpine*)
