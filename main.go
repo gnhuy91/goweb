@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -32,19 +31,7 @@ CREATE TABLE place (
 var logger = log.New(os.Stdout, "", 0)
 
 func main() {
-	postgresHost := os.Getenv("POSTGRES_HOST")
-	if postgresHost == "" {
-		postgresHost = "127.0.0.1:5432"
-	}
-
-	dsn := fmt.Sprintf("%s://%s:%s@%s/%s",
-		"postgres",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		postgresHost,
-		os.Getenv("POSTGRES_DB"))
-
-	db, err := Connect("postgres", dsn+"?sslmode=disable")
+	db, err := Connect("postgres", initDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}
