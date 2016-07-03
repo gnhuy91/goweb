@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
@@ -31,19 +30,7 @@ CREATE TABLE place (
 var logger = log.New(os.Stdout, "", 0)
 
 func main() {
-	postgresHost := os.Getenv("POSTGRES_HOST")
-	if postgresHost == "" {
-		postgresHost = "127.0.0.1:5432"
-	}
-
-	dsn := fmt.Sprintf("%s://%s:%s@%s/%s",
-		"postgres",
-		os.Getenv("POSTGRES_USER"),
-		os.Getenv("POSTGRES_PASSWORD"),
-		postgresHost,
-		os.Getenv("POSTGRES_DB"))
-
-	db, err := Connect("postgres", dsn+"?sslmode=disable")
+	db, err := Connect(dbDriver, initDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -55,7 +42,6 @@ func main() {
 		log.Println(err)
 	}
 
-	hDB := &DB{db.DB}
 	// r := mux.NewRouter()
 
 	// // my version of 'HTTP closure'
@@ -66,13 +52,13 @@ func main() {
 	// // hanlder with no closure
 	// r.HandleFunc("/about", About)
 
-	// r.Handle("/users", UserList(hDB)).Methods("GET", "HEAD")
-	// r.Handle("/user", UserHandler(hDB)).Methods("POST")
+	// r.Handle("/users", UserList(db)).Methods("GET", "HEAD")
+	// r.Handle("/user", UserHandler(db)).Methods("POST")
 
-	// r.Handle("/gendata", GenDataHandler(hDB)).Methods("GET")
+	// r.Handle("/gendata", GenDataHandler(db)).Methods("GET")
 
 	// log.Fatal(http.ListenAndServe(":8080", r))
 
-	r := NewRouter(hDB)
+	r := NewRouter(db)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
