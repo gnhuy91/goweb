@@ -31,7 +31,7 @@ CREATE TABLE place (
 var logger = log.New(os.Stdout, "", 0)
 
 func main() {
-	db, err := Connect("postgres", initDSN())
+	db, err := Connect(dbDriver, initDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -5,6 +5,8 @@ import (
 	"os"
 )
 
+const dbDriver = "postgres"
+
 func initDSN() string {
 	// Prepare db DSN here
 	postgresHost := os.Getenv("POSTGRES_HOST")
