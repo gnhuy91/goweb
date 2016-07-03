@@ -17,13 +17,12 @@ func TestUserList_StatusOK(t *testing.T) {
 	}
 	defer db.Close()
 
-	h := UserList(db)
 	req, _ := http.NewRequest("GET", url, nil)
 
 	// Use Recorder to record handler's response
 	rec := httptest.NewRecorder()
 
-	h.ServeHTTP(rec, req)
+	NewRouter(db).ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK {
 		t.Errorf("%s didn't return %v", url, http.StatusOK)
 	}
