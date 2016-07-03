@@ -56,7 +56,6 @@ func main() {
 		log.Println(err)
 	}
 
-	hDB := &DB{db.DB}
 	r := mux.NewRouter()
 
 	// my version of 'HTTP closure'
@@ -67,10 +66,10 @@ func main() {
 	// hanlder with no closure
 	r.HandleFunc("/about", About)
 
-	r.Handle("/users", UserList(hDB)).Methods("GET", "HEAD")
-	r.Handle("/user", UserHandler(hDB)).Methods("POST")
+	r.Handle("/users", UserList(db)).Methods("GET", "HEAD")
+	r.Handle("/user", UserHandler(db)).Methods("POST")
 
-	r.Handle("/gendata", GenDataHandler(hDB)).Methods("GET")
+	r.Handle("/gendata", GenDataHandler(db)).Methods("GET")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }
