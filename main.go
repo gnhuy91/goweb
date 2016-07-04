@@ -60,5 +60,5 @@ func main() {
 	// log.Fatal(http.ListenAndServe(":8080", r))
 
 	r := NewRouter(db)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), r))
 }
