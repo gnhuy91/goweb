@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/gnhuy91/go-vcap-parser"
@@ -28,8 +29,8 @@ func initDSN() string {
 	if vcapServices != "" {
 		vcap, err := vcapparser.ParseVcapServices(vcapServices)
 		if err != nil {
-			fmt.Println("Error reading VCAP_SERVICES env:", err)
-			fmt.Println("Fall back to default DSN...")
+			log.Println("Error reading VCAP_SERVICES env:", err)
+			log.Println("Fall back to default DSN...")
 			return dsn
 		}
 		dsn = vcap["postgres"][0].Credentials.DSN
