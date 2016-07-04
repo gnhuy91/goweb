@@ -28,7 +28,8 @@ func initDSN() string {
 	if vcapServices != "" {
 		vcap, err := vcapparser.ParseVcapServices(vcapServices)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Println("Error reading VCAP_SERVICES env:", err)
+			return dsn
 		}
 		dsn = vcap["postgres"][0].Credentials.DSN
 	}
