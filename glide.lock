@@ -1,6 +1,8 @@
-hash: 706ef0445e0c75407a7f782f641f71bf72cbc67e4e53e7a1bb98cc75f4a285ce
-updated: 2016-06-21T14:59:23.795092094+07:00
+hash: d3093ff6a86a9e8adc12123b8b5ce7987ea2ceacc281f80b71fd894bd670ff0c
+updated: 2016-07-04T11:14:58.25024094+07:00
 imports:
+- name: github.com/erikstmartin/go-testdb
+  version: 8d10e4a1bae52cd8b81ffdec3445890d6dccab3d
 - name: github.com/gorilla/context
   version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/mux

@@ -3,3 +3,4 @@ import:
 - package: github.com/gorilla/mux
 - package: github.com/jmoiron/sqlx
 - package: github.com/lib/pq
+- package: github.com/erikstmartin/go-testdb
