@@ -1,7 +1,5 @@
 language: go
 
-sudo: false
-
 addons:
   apt:
     sources:
@@ -18,12 +16,7 @@ services:
   - postgresql
 
 env:
-  global:
-    - POSTGRES_HOST=127.0.0.1:5432
-    - POSTGRES_USER=postgres
-    - POSTGRES_PASSWORD=""
-    - POSTGRES_DB=travis_ci_test
-    - PORT=8080
+  - PORT=8080 POSTGRES_HOST=127.0.0.1:5432 POSTGRES_USER=postgres POSTGRES_PASSWORD="" POSTGRES_DB=travis_ci_test
 
 install:
   - glide install -s
