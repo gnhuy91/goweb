@@ -11,44 +11,37 @@ import (
 var db *DB
 
 func TestMain(m *testing.M) {
-	db, err := Connect(dbDriver, initDSN())
+	dbc, err := Connect(dbDriver, initDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}
+	// assign to global var so following tests can make use of it
+	db = dbc
 	defer db.Close()
 
-	// Generate Schema
-	log.Println("Generate DB Schema...")
-	if _, err := db.Exec(schema); err != nil {
-		log.Println(err)
-	}
-
-	// setup()
-
+	setup()
 	code := m.Run()
-
-	// shutdown()
+	shutdown()
 
 	os.Exit(code)
 }
 
 func setup() {
+	// prepare things here
 
+	// Generate DB Schema
+	log.Println("Generate DB Schema...")
+	if _, err := db.Exec(schema); err != nil {
+		log.Println(err)
+	}
 }
 
 func shutdown() {
-
+	// tear-down prepared things here
 }
 
 func TestUserList_StatusOK(t *testing.T) {
 	url := "/users"
-
-	// Open our connection and setup our handler
-	// db, err := Connect(dbDriver, initDSN())
-	// if err != nil {
-	// 	log.Fatalln(err)
-	// }
-	// defer db.Close()
 
 	req, _ := http.NewRequest("GET", url, nil)
 
