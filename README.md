@@ -10,10 +10,11 @@ glide install
 - Prepare env
 
 ```sh
+export POSTGRES_HOST=127.0.0.1:5432
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=mypostgres
-export POSTGRES_HOST=127.0.0.1:5432
 export POSTGRES_DB=users
+export PORT=8080
 ```
 
 - Start a `postgres` container
