@@ -1,5 +1,5 @@
-hash: d140c550e3a85c644207edb361a28b48acd9cba7f127efbe9878916f0f5c6bb9
-updated: 2016-07-04T16:56:53.852212378+07:00
+hash: 18480f4eb80982411b1b39bfecf39e83caa1e9ca8a25e3f73f18db4410f35334
+updated: 2016-07-05T11:49:39.082927923+07:00
 imports:
 - name: github.com/gnhuy91/go-vcap-parser
   version: c50a5ab062d71bc28c2afa414907eb6e7ed95d6f

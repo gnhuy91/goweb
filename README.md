@@ -5,7 +5,7 @@
 
 - Install dependencies
 ```console
-glide install
+glide install -s
 ```
 
 - Prepare env
