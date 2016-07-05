@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/gnhuy91/go-vcap-parser"
 )
 
 const dbDriver = "postgres"
@@ -20,6 +23,27 @@ func initDSN() string {
 		os.Getenv("POSTGRES_PASSWORD"),
 		postgresHost,
 		os.Getenv("POSTGRES_DB")) + "?sslmode=disable"
+
+	// For deploying to Cloud Foundry
+	vcapServices := os.Getenv("VCAP_SERVICES")
+	if vcapServices != "" {
+		vcap, err := vcapparser.ParseVcapServices(vcapServices)
+		if err != nil {
+			log.Println("Error reading VCAP_SERVICES env:", err)
+			return dsn
+		}
+
+		pg, prs := vcap["postgres"]
+		if !prs {
+			log.Println(`Error reading "postgres" from VCAP_SERVICES`)
+			return dsn
+		}
+		if len(pg) == 0 {
+			log.Println(`Error reading "postgres" from VCAP_SERVICES: index out of range`)
+			return dsn
+		}
+		dsn = pg[0].Credentials.DSN
+	}
 
 	return dsn
 }

@@ -1,0 +1,12 @@
+---
+applications:
+  - name: huygn-goweb
+    buildpack: https://github.com/cloudfoundry/go-buildpack.git
+    memory: 256M
+    instances: '1'
+    stack: cflinuxfs2
+    env:
+      GOVERSION: go1.6
+      GOPACKAGENAME: goweb
+    services:
+      - postgres

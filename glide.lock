@@ -1,6 +1,8 @@
-hash: 706ef0445e0c75407a7f782f641f71bf72cbc67e4e53e7a1bb98cc75f4a285ce
-updated: 2016-06-21T14:59:23.795092094+07:00
+hash: d140c550e3a85c644207edb361a28b48acd9cba7f127efbe9878916f0f5c6bb9
+updated: 2016-07-04T16:56:53.852212378+07:00
 imports:
+- name: github.com/gnhuy91/go-vcap-parser
+  version: c50a5ab062d71bc28c2afa414907eb6e7ed95d6f
 - name: github.com/gorilla/context
   version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/mux
