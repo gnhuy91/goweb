@@ -30,10 +30,19 @@ func initDSN() string {
 		vcap, err := vcapparser.ParseVcapServices(vcapServices)
 		if err != nil {
 			log.Println("Error reading VCAP_SERVICES env:", err)
-			log.Println("Fall back to default DSN...")
 			return dsn
 		}
-		dsn = vcap["postgres"][0].Credentials.DSN
+
+		pg, prs := vcap["postgres"]
+		if !prs {
+			log.Println(`Error reading "postgres" from VCAP_SERVICES`)
+			return dsn
+		}
+		if len(pg) == 0 {
+			log.Println(`Error reading "postgres" from VCAP_SERVICES: index out of range`)
+			return dsn
+		}
+		dsn = pg[0].Credentials.DSN
 	}
 
 	return dsn
