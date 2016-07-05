@@ -11,8 +11,13 @@ services:
 env:
   - POSTGRES_HOST=127.0.0.1:5432 POSTGRES_USER=postgres POSTGRES_PASSWORD="" POSTGRES_DB=travis_ci_test
 
+before_install:
+  - sudo add-apt-repository ppa:masterminds/glide
+  - sudo apt-get update
+  - sudo apt-get install glide
+
 install:
-  - go get -t -v
+  - glide install
 
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
