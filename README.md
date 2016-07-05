@@ -1,4 +1,4 @@
-# goweb
+# goweb [![Build Status](https://travis-ci.org/gnhuy91/goweb.svg?branch=travis-test)](https://travis-ci.org/gnhuy91/goweb)
 
 ## Instruction
 - Install [`glide`](https://github.com/Masterminds/glide) - Go package management tool

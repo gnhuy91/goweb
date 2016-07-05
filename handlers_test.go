@@ -4,18 +4,44 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
-func TestUserList_StatusOK(t *testing.T) {
-	url := "/users"
+var db *DB
 
-	// Open our connection and setup our handler
-	db, err := Connect(dbDriver, initDSN())
+func TestMain(m *testing.M) {
+	dbc, err := Connect(dbDriver, initDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}
+	// assign to global var so following tests can make use of it
+	db = dbc
 	defer db.Close()
+
+	setup()
+	code := m.Run()
+	shutdown()
+
+	os.Exit(code)
+}
+
+func setup() {
+	// prepare things here
+
+	// Generate DB Schema
+	log.Println("Generate DB Schema...")
+	if _, err := db.Exec(schema); err != nil {
+		log.Println(err)
+	}
+}
+
+func shutdown() {
+	// tear-down prepared things here
+}
+
+func TestUserList_StatusOK(t *testing.T) {
+	url := "/users"
 
 	req, _ := http.NewRequest("GET", url, nil)
 
