@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"goweb/models"
+	"github.com/gnhuy91/goweb/models"
 
 	"github.com/gorilla/mux"
 )
