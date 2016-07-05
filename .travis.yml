@@ -10,11 +10,11 @@ services:
 
 env:
   - >
+    GO15VENDOREXPERIMENT=1
     POSTGRES_HOST=127.0.0.1:5432
     POSTGRES_USER=postgres
     POSTGRES_PASSWORD=""
     POSTGRES_DB=travis_ci_test
-    GO15VENDOREXPERIMENT=1
 
 before_install:
   - sudo add-apt-repository -y ppa:masterminds/glide
