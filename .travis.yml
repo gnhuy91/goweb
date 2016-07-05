@@ -1,0 +1,24 @@
+language: go
+
+sudo: false
+
+go:
+  - 1.5
+  - 1.6
+  - tip
+
+services:
+  - postgresql
+
+env:
+  - POSTGRES_HOST=127.0.0.1:5432
+  - POSTGRES_USER=postgres
+  - POSTGRES_PASSWORD=""
+  - POSTGRES_DB=travis_ci_test
+  - PORT=8080
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+
+script:
+  - go test -v ./...
