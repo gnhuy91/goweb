@@ -1,6 +1,7 @@
 # goweb
 
 ## Instruction
+- Install [`glide`](https://github.com/Masterminds/glide) - Go package management tool
 
 - Install dependencies
 ```console
