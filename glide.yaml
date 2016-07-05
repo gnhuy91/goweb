@@ -1,6 +1,6 @@
-package: .
+package: github.com/gnhuy91/goweb
 import:
+- package: github.com/gnhuy91/go-vcap-parser
 - package: github.com/gorilla/mux
 - package: github.com/jmoiron/sqlx
 - package: github.com/lib/pq
-- package: github.com/gnhuy91/go-vcap-parser
