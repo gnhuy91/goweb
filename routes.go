@@ -35,19 +35,19 @@ func routes(db *DB) Routes {
 			// Because these handlers wrap and return a function,
 			// the returned function's return type is unknown at this point,
 			// we must do a type assertion so the compiler won't complain
-			UserHandler(db).(http.HandlerFunc),
+			WithUAA(UserHandler(db)).(http.HandlerFunc),
 		},
 		Route{
 			"UserList",
 			[]string{"GET"},
 			"/users",
-			WithMetrics(logger, UserList(db)).(http.HandlerFunc),
+			WithUAA(UserList(db)).(http.HandlerFunc),
 		},
 		Route{
 			"GenData",
 			[]string{"GET"},
 			"/gendata",
-			WithMetrics(logger, GenDataHandler(db)).(http.HandlerFunc),
+			WithUAA(GenDataHandler(db)).(http.HandlerFunc),
 		},
 	}
 }

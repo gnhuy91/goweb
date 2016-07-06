@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gnhuy91/go-uaa"
 	"github.com/gnhuy91/goweb/models"
 
 	"github.com/gorilla/mux"
@@ -104,6 +105,28 @@ func (db *DB) GetUsers() ([]*models.User, error) {
 	var users []*models.User
 	err := db.Select(&users, "SELECT * FROM user_info")
 	return users, err
+}
+
+func WithUAA(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// read Bearer token from Body
+		authStr := r.Header.Get("Authorization")
+
+		// Check if token is valid
+		checkStatusCode, err := uaa.CheckUAAToken(uaaCheckTokenURI, authStr)
+
+		// Only valid token can process the request
+		if checkStatusCode != http.StatusOK {
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(checkStatusCode)
+			m := map[string]string{"error": err.Error()}
+			if err := json.NewEncoder(w).Encode(m); err != nil {
+				log.Println(err)
+			}
+			return
+		}
+		next.ServeHTTP(w, r)
+	})
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!
