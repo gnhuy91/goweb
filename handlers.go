@@ -192,7 +192,7 @@ func (tx *Tx) UpdateUserByID(userID int, user *models.User) error {
 			first_name=:first_name,
 			last_name=:last_name,
 			email=:email
-		WHERE id=:id;`, &models.User{
+		WHERE id=:id`, &models.User{
 			ID:        userID,
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
