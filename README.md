@@ -1,9 +1,13 @@
 # goweb [![Build Status](https://travis-ci.org/gnhuy91/goweb.svg?branch=travis-test)](https://travis-ci.org/gnhuy91/goweb)
 
 ## Instruction
+
+### Local development
+
 - Install [`glide`](https://github.com/Masterminds/glide) - Go package management tool
 
 - Install dependencies
+
 ```console
 glide install -s
 ```
@@ -29,14 +33,28 @@ docker run -d --name=pg \
     postgres
 ```
 
-- Run the app
-
-```console
-go run *.go
-```
-
 - Building (for *alpine*)
 
 ```console
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build
+GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/goweb
+```
+
+- Run the app
+
+```console
+bin/goweb
+```
+
+### Deploy to Cloud Foundry
+
+- Build the app
+
+```console
+go build -o bin/goweb
+```
+
+- Push to Cloud Foundry
+
+```console
+cf push -f manifest.yml
 ```
