@@ -29,12 +29,18 @@ func routes(db *DB) Routes {
 			About,
 		},
 		Route{
-			"UserCreate",
-			[]string{"POST"},
-			"/user",
+			"UserByID",
+			[]string{"GET", "PUT", "DELETE"},
+			"/user/{id}",
 			// Because these handlers wrap and return a function,
 			// the returned function's return type is unknown at this point,
 			// we must do a type assertion so the compiler won't complain
+			UserHandler(db).(http.HandlerFunc),
+		},
+		Route{
+			"UserCreate",
+			[]string{"POST"},
+			"/user",
 			UserHandler(db).(http.HandlerFunc),
 		},
 		Route{

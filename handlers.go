@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gnhuy91/goweb/models"
@@ -23,26 +24,98 @@ func (db *DB) Begin() (*Tx, error) {
 
 func UserHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var u models.User
-		err := json.NewDecoder(r.Body).Decode(&u)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if u == (models.User{}) {
-			http.Error(w, "user is empty", http.StatusBadRequest)
-			return
-		}
+		switch r.Method {
+		case "GET":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
 
-		tx, err := db.Begin()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			user, err := db.GetUserByID(userID)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			if err := json.NewEncoder(w).Encode(user); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+		case "POST":
+			var u models.User
+			err := json.NewDecoder(r.Body).Decode(&u)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			if u == (models.User{}) {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			tx.CreateUser(&u)
+			tx.Commit()
+
+		case "PUT":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
+
+			// Parse body
+			var u models.User
+			if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+				log.Println(err)
+				http.Error(w, "unknown format", http.StatusBadRequest)
+				return
+			}
+			if u == (models.User{}) {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.UpdateUserByID(userID, &u); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		case "DELETE":
+			// Remove the record.
+
+		default:
+			w.WriteHeader(http.StatusNotFound)
 		}
-		tx.CreateUser(&u)
-		tx.Commit()
 	})
 }
 
@@ -102,8 +175,30 @@ func (tx *Tx) CreateUser(m *models.User) error {
 
 func (db *DB) GetUsers() ([]*models.User, error) {
 	var users []*models.User
-	err := db.Select(&users, "SELECT * FROM user_info")
+	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
 	return users, err
+}
+
+func (db *DB) GetUserByID(userID int) (models.User, error) {
+	var user models.User
+	err := db.Get(&user, "SELECT * FROM user_info WHERE id=$1", userID)
+	return user, err
+}
+
+func (tx *Tx) UpdateUserByID(userID int, user *models.User) error {
+	_, err := tx.NamedExec(
+		`UPDATE user_info
+		SET
+			first_name=:first_name,
+			last_name=:last_name,
+			email=:email
+		WHERE id=:id;`, &models.User{
+			ID:        userID,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+		})
+	return err
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!
