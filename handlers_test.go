@@ -11,7 +11,7 @@ import (
 var db *DB
 
 func TestMain(m *testing.M) {
-	dbc, err := Connect(dbDriver, initDSN())
+	dbc, err := Connect(dbDriver, configDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}
