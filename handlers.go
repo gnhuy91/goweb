@@ -109,21 +109,23 @@ func (db *DB) GetUsers() ([]*models.User, error) {
 
 func WithUAA(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// read Bearer token from Body
-		authStr := r.Header.Get("Authorization")
+		if uaaURI != "" {
+			// read Bearer token from Body
+			authStr := r.Header.Get("Authorization")
 
-		// Check if token is valid
-		checkStatusCode, err := uaa.CheckUAAToken(uaaCheckTokenURI, authStr)
+			// Check if token is valid
+			checkStatusCode, err := uaa.CheckUAAToken(uaaCheckTokenURI, authStr)
 
-		// Only valid token can process the request
-		if checkStatusCode != http.StatusOK {
-			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-			w.WriteHeader(checkStatusCode)
-			m := map[string]string{"error": err.Error()}
-			if err := json.NewEncoder(w).Encode(m); err != nil {
-				log.Println(err)
+			// Only valid token can process the request
+			if checkStatusCode != http.StatusOK {
+				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+				w.WriteHeader(checkStatusCode)
+				m := map[string]string{"error": err.Error()}
+				if err := json.NewEncoder(w).Encode(m); err != nil {
+					log.Println(err)
+				}
+				return
 			}
-			return
 		}
 		next.ServeHTTP(w, r)
 	})
