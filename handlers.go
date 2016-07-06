@@ -23,9 +23,8 @@ func (db *DB) Begin() (*Tx, error) {
 
 func UserHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		decoder := json.NewDecoder(r.Body)
 		var u models.User
-		err := decoder.Decode(&u)
+		err := json.NewDecoder(r.Body).Decode(&u)
 		if err != nil {
 			log.Println(err)
 			http.Error(w, err.Error(), http.StatusBadRequest)
