@@ -30,7 +30,7 @@ CREATE TABLE place (
 var logger = log.New(os.Stdout, "", 0)
 
 func main() {
-	db, err := Connect(dbDriver, initDSN())
+	db, err := Connect(dbDriver, configDSN())
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -60,5 +60,5 @@ func main() {
 	// log.Fatal(http.ListenAndServe(":8080", r))
 
 	r := NewRouter(db)
-	log.Fatal(http.ListenAndServe(":"+os.Getenv("PORT"), r))
+	log.Fatal(http.ListenAndServe(configPort(), r))
 }

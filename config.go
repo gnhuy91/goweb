@@ -10,7 +10,15 @@ import (
 
 const dbDriver = "postgres"
 
-func initDSN() string {
+func configPort() string {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	return ":" + port
+}
+
+func configDSN() string {
 	// Prepare db DSN here
 	postgresHost := os.Getenv("POSTGRES_HOST")
 	if postgresHost == "" {
