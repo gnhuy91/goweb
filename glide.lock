@@ -1,6 +1,8 @@
-hash: 54f7ceb62873464cd5ab210d2e49bbee2b32a5cb5e1d26c9929e8330a1f66a72
-updated: 2016-07-06T15:23:50.415756384+07:00
+hash: 6a57f9bd3aff46a7048d6967911bc1249a9ed8ff4b16b1ace598397fcdb94dc9
+updated: 2016-07-06T16:25:58.417723528+07:00
 imports:
+- name: github.com/gnhuy91/go-uaa
+  version: 548b85a1e6ef88bf71571e9eaf3bc930e4c543de
 - name: github.com/gnhuy91/go-vcap-parser
   version: 3620995c699eb5d16d3e60805191995396952b66
 - name: github.com/gorilla/context
