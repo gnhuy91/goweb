@@ -48,8 +48,8 @@ func TestUserList_StatusOK(t *testing.T) {
 	// Use Recorder to record handler's response
 	rec := httptest.NewRecorder()
 
-	NewRouter(db).ServeHTTP(rec, req)
+	UserList(db).ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK {
-		t.Errorf("%s didn't return %v", url, http.StatusOK)
+		t.Errorf("%s didn't return %v, return %v", url, http.StatusOK, rec.Code)
 	}
 }
