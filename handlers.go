@@ -111,7 +111,31 @@ func UserHandler(db *DB) http.Handler {
 			}
 
 		case "DELETE":
-			// Remove the record.
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.DeleteUserByID(userID); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 
 		default:
 			w.WriteHeader(http.StatusNotFound)
@@ -198,6 +222,12 @@ func (tx *Tx) UpdateUserByID(userID int, user *models.User) error {
 			LastName:  user.LastName,
 			Email:     user.Email,
 		})
+	return err
+}
+
+func (tx *Tx) DeleteUserByID(userID int) error {
+	// TODO: check if id exist before deleting
+	_, err := tx.Exec(`DELETE FROM user_info WHERE id=$1`, userID)
 	return err
 }
 
