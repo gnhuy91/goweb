@@ -233,7 +233,7 @@ func (tx *Tx) CreateUser(m *models.User) error {
 	if m == nil {
 		return errors.New("user required")
 	}
-	_, err := tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", m.FirstName, m.LastName, m.Email)
+	err := m.Insert(tx)
 	return err
 }
 
