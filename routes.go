@@ -38,14 +38,14 @@ func routes(db *DB) Routes {
 			UserHandler(db).(http.HandlerFunc),
 		},
 		Route{
-			"UserCreate",
+			"User",
 			[]string{"POST"},
 			"/user",
 			UserHandler(db).(http.HandlerFunc),
 		},
 		Route{
 			"UserList",
-			[]string{"GET"},
+			[]string{"GET", "POST"},
 			"/users",
 			WithMetrics(logger, UserList(db)).(http.HandlerFunc),
 		},

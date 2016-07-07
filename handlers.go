@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gnhuy91/goweb/models"
@@ -145,18 +146,57 @@ func UserHandler(db *DB) http.Handler {
 
 func UserList(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		users, err := db.GetUsers()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(users); err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		switch r.Method {
+		case "GET":
+			users, err := db.GetUsers()
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(http.StatusOK)
+			if err := json.NewEncoder(w).Encode(users); err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+		case "POST":
+			var users []models.User
+			err := json.NewDecoder(r.Body).Decode(&users)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			// simple data validation
+			if users == nil || len(users) == 0 {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+			for _, u := range users {
+				if u.Email == "" || u.FirstName == "" || u.LastName == "" {
+					w.WriteHeader(http.StatusBadRequest)
+				}
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.CreateUsers(users); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}
 	})
 }
@@ -194,6 +234,34 @@ func (tx *Tx) CreateUser(m *models.User) error {
 		return errors.New("user required")
 	}
 	_, err := tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", m.FirstName, m.LastName, m.Email)
+	return err
+}
+
+func (tx *Tx) CreateUsers(m []models.User) error {
+	if m == nil {
+		return errors.New("user required")
+	}
+
+	// Build multiple values query
+	query := "INSERT INTO user_info (first_name, last_name, email) VALUES "
+	var (
+		vals []interface{}
+		i    int
+	)
+	for _, row := range m {
+		query += fmt.Sprintf("($%v, $%v, $%v),", i+1, i+2, i+3)
+		i += 3
+		vals = append(vals, row.FirstName, row.LastName, row.Email)
+	}
+	// Remove trailing comma
+	query = strings.TrimSuffix(query, ",")
+
+	s, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = s.Exec(vals...)
+
 	return err
 }
 
