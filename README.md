@@ -15,12 +15,11 @@ glide install -s
 - Prepare env
 
 ```sh
-export PORT=8080
 export POSTGRES_HOST=127.0.0.1:5432
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=mypostgres
 export POSTGRES_DB=users
-export UAA_URI=<your_uaa_instance_uri>
+export PORT=8080
 ```
 
 - Start a `postgres` container

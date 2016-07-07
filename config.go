@@ -62,12 +62,6 @@ func configDSN() string {
 }
 
 func getUaaURI() string {
-	// Check if UAA_URI env is provided
-	if uri := os.Getenv("UAA_URI"); uri != "" {
-		return uri
-	}
-
-	// If no UAA_URI provided, try parsing it from VCAP_SERVICES
 	vcapServices := os.Getenv("VCAP_SERVICES")
 	if vcapServices == "" {
 		return ""
