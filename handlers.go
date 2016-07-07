@@ -163,7 +163,7 @@ func UserList(db *DB) http.Handler {
 			}
 
 		case "POST":
-			var users []models.User
+			var users []*models.User
 			err := json.NewDecoder(r.Body).Decode(&users)
 			if err != nil {
 				log.Println(err)
@@ -176,7 +176,7 @@ func UserList(db *DB) http.Handler {
 				return
 			}
 			for _, u := range users {
-				if u.Email == "" || u.FirstName == "" || u.LastName == "" {
+				if u == nil || u.Email == "" || u.FirstName == "" || u.LastName == "" {
 					w.WriteHeader(http.StatusBadRequest)
 				}
 			}
@@ -237,7 +237,7 @@ func (tx *Tx) CreateUser(m *models.User) error {
 	return err
 }
 
-func (tx *Tx) CreateUsers(m []models.User) error {
+func (tx *Tx) CreateUsers(m []*models.User) error {
 	if m == nil {
 		return errors.New("user required")
 	}
