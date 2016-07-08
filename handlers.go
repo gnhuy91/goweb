@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gnhuy91/go-uaa"
@@ -24,43 +26,178 @@ func (db *DB) Begin() (*Tx, error) {
 
 func UserHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var u models.User
-		err := json.NewDecoder(r.Body).Decode(&u)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if u == (models.User{}) {
-			http.Error(w, "user is empty", http.StatusBadRequest)
-			return
-		}
+		switch r.Method {
+		case "GET":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
 
-		tx, err := db.Begin()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			user, err := db.GetUserByID(userID)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			if err := json.NewEncoder(w).Encode(user); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+		case "POST":
+			var u models.User
+			err := json.NewDecoder(r.Body).Decode(&u)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			if u == (models.User{}) {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			tx.CreateUser(&u)
+			tx.Commit()
+
+		case "PUT":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
+
+			// Parse body
+			var u models.User
+			if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+				log.Println(err)
+				http.Error(w, "unknown format", http.StatusBadRequest)
+				return
+			}
+			if u == (models.User{}) {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.UpdateUserByID(userID, &u); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		case "DELETE":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.DeleteUserByID(userID); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		default:
+			w.WriteHeader(http.StatusNotFound)
 		}
-		tx.CreateUser(&u)
-		tx.Commit()
 	})
 }
 
 func UserList(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		users, err := db.GetUsers()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(users); err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		switch r.Method {
+		case "GET":
+			users, err := db.GetUsers()
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(http.StatusOK)
+			if err := json.NewEncoder(w).Encode(users); err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+		case "POST":
+			var users []*models.User
+			err := json.NewDecoder(r.Body).Decode(&users)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			// simple data validation
+			if users == nil || len(users) == 0 {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+			for _, u := range users {
+				if u == nil || u.Email == "" || u.FirstName == "" || u.LastName == "" {
+					w.WriteHeader(http.StatusBadRequest)
+				}
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.CreateUsers(users); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}
 	})
 }
@@ -101,10 +238,66 @@ func (tx *Tx) CreateUser(m *models.User) error {
 	return err
 }
 
+func (tx *Tx) CreateUsers(m []*models.User) error {
+	if m == nil {
+		return errors.New("user required")
+	}
+
+	// Build multiple values query
+	query := "INSERT INTO user_info (first_name, last_name, email) VALUES "
+	var (
+		vals []interface{}
+		i    int
+	)
+	for _, row := range m {
+		query += fmt.Sprintf("($%v, $%v, $%v),", i+1, i+2, i+3)
+		i += 3
+		vals = append(vals, row.FirstName, row.LastName, row.Email)
+	}
+	// Remove trailing comma
+	query = strings.TrimSuffix(query, ",")
+
+	s, err := tx.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = s.Exec(vals...)
+
+	return err
+}
+
 func (db *DB) GetUsers() ([]*models.User, error) {
 	var users []*models.User
-	err := db.Select(&users, "SELECT * FROM user_info")
+	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
 	return users, err
+}
+
+func (db *DB) GetUserByID(userID int) (models.User, error) {
+	var user models.User
+	err := db.Get(&user, "SELECT * FROM user_info WHERE id=$1", userID)
+	return user, err
+}
+
+func (tx *Tx) UpdateUserByID(userID int, user *models.User) error {
+	_, err := tx.NamedExec(
+		`UPDATE user_info
+		SET
+			first_name=:first_name,
+			last_name=:last_name,
+			email=:email
+		WHERE id=:id`, &models.User{
+			ID:        userID,
+			FirstName: user.FirstName,
+			LastName:  user.LastName,
+			Email:     user.Email,
+		})
+	return err
+}
+
+func (tx *Tx) DeleteUserByID(userID int) error {
+	// TODO: check if id exist before deleting
+	_, err := tx.Exec(`DELETE FROM user_info WHERE id=$1`, userID)
+	return err
 }
 
 func WithUAA(next http.Handler) http.Handler {
