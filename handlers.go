@@ -51,14 +51,14 @@ func UserHandler(db *DB) http.Handler {
 			}
 
 		case "POST":
-			var u models.User
+			var u models.UserInfo
 			err := json.NewDecoder(r.Body).Decode(&u)
 			if err != nil {
 				log.Println(err)
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-			if u == (models.User{}) {
+			if u == (models.UserInfo{}) {
 				http.Error(w, "user is empty", http.StatusBadRequest)
 				return
 			}
@@ -92,13 +92,13 @@ func UserHandler(db *DB) http.Handler {
 			}
 
 			// Parse body
-			var u models.User
+			var u models.UserInfo
 			if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
 				log.Println(err)
 				http.Error(w, "unknown format", http.StatusBadRequest)
 				return
 			}
-			if u == (models.User{}) {
+			if u == (models.UserInfo{}) {
 				http.Error(w, "user is empty", http.StatusBadRequest)
 				return
 			}
@@ -172,7 +172,7 @@ func UserList(db *DB) http.Handler {
 			}
 
 		case "POST":
-			var users []*models.User
+			var users []*models.UserInfo
 			err := json.NewDecoder(r.Body).Decode(&users)
 			if err != nil {
 				log.Println(err)
@@ -236,7 +236,7 @@ func (tx *Tx) GenerateData() {
 	// }
 }
 
-func (tx *Tx) CreateUsers(m []*models.User) error {
+func (tx *Tx) CreateUsers(m []*models.UserInfo) error {
 	if m == nil {
 		return errors.New("user required")
 	}
@@ -264,26 +264,26 @@ func (tx *Tx) CreateUsers(m []*models.User) error {
 	return err
 }
 
-func (db *DB) GetUsers() ([]*models.User, error) {
-	var users []*models.User
+func (db *DB) GetUsers() ([]*models.UserInfo, error) {
+	var users []*models.UserInfo
 	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
 	return users, err
 }
 
-func (db *DB) GetUserByID(userID int) (models.User, error) {
-	var user models.User
+func (db *DB) GetUserByID(userID int) (models.UserInfo, error) {
+	var user models.UserInfo
 	err := db.Get(&user, "SELECT * FROM user_info WHERE id=$1", userID)
 	return user, err
 }
 
-func (tx *Tx) UpdateUserByID(userID int, user *models.User) error {
+func (tx *Tx) UpdateUserByID(userID int, user *models.UserInfo) error {
 	_, err := tx.NamedExec(
 		`UPDATE user_info
 		SET
 			first_name=:first_name,
 			last_name=:last_name,
 			email=:email
-		WHERE id=:id`, &models.User{
+		WHERE id=:id`, &models.UserInfo{
 			ID:        userID,
 			FirstName: user.FirstName,
 			LastName:  user.LastName,
