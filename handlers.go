@@ -109,7 +109,8 @@ func UserHandler(db *DB) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if err := tx.UpdateUserByID(userID, &u); err != nil {
+			u.ID = userID
+			if err := u.Update(tx); err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -274,22 +275,6 @@ func (db *DB) GetUserByID(userID int) (models.UserInfo, error) {
 	var user models.UserInfo
 	err := db.Get(&user, "SELECT * FROM user_info WHERE id=$1", userID)
 	return user, err
-}
-
-func (tx *Tx) UpdateUserByID(userID int, user *models.UserInfo) error {
-	_, err := tx.NamedExec(
-		`UPDATE user_info
-		SET
-			first_name=:first_name,
-			last_name=:last_name,
-			email=:email
-		WHERE id=:id`, &models.UserInfo{
-			ID:        userID,
-			FirstName: user.FirstName,
-			LastName:  user.LastName,
-			Email:     user.Email,
-		})
-	return err
 }
 
 func (tx *Tx) DeleteUserByID(userID int) error {
