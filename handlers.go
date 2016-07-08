@@ -69,8 +69,17 @@ func UserHandler(db *DB) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			tx.CreateUser(&u)
-			tx.Commit()
+			err = u.Insert(tx)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			err = tx.Commit()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 
 		case "PUT":
 			vars := mux.Vars(r)
@@ -225,16 +234,6 @@ func (tx *Tx) GenerateData() {
 	// if err != nil {
 	// 	log.Println(err)
 	// }
-}
-
-// CreateUser create a user in the db
-func (tx *Tx) CreateUser(m *models.User) error {
-	// Validate the input
-	if m == nil {
-		return errors.New("user required")
-	}
-	err := m.Insert(tx)
-	return err
 }
 
 func (tx *Tx) CreateUsers(m []*models.User) error {
