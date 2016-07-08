@@ -10,7 +10,7 @@ type User struct {
 	FirstName string `db:"first_name" json:"first_name"`
 	LastName  string `db:"last_name" json:"last_name"`
 	Email     string `db:"email" json:"email"`
-	// xo fields
+	// private fields
 	_exists, _deleted bool
 }
 
@@ -20,12 +20,8 @@ type Place struct {
 	TelCode int
 }
 
-type Message struct {
-	Text string `json:"msg"`
-}
-
 // Insert inserts the User to the database.
-func (u *User) Insert(db XODB) error {
+func (u *User) Insert(db DB) error {
 	var err error
 
 	// if already exist, bail
@@ -52,7 +48,7 @@ func (u *User) Insert(db XODB) error {
 	return nil
 }
 
-type XODB interface {
+type DB interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 	Query(string, ...interface{}) (*sql.Rows, error)
 	QueryRow(string, ...interface{}) *sql.Row
