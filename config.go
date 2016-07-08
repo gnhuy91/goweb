@@ -10,6 +10,11 @@ import (
 
 const dbDriver = "postgres"
 
+var (
+	uaaURI           = getUaaURI()
+	uaaCheckTokenURI = uaaURI + "/check_token"
+)
+
 func configPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -54,4 +59,28 @@ func configDSN() string {
 	}
 
 	return dsn
+}
+
+func getUaaURI() string {
+	vcapServices := os.Getenv("VCAP_SERVICES")
+	if vcapServices == "" {
+		return ""
+	}
+	vcap, err := vcapparser.ParseVcapServices(vcapServices)
+	if err != nil {
+		log.Println("Error reading VCAP_SERVICES env:", err)
+		return ""
+	}
+
+	uaa, prs := vcap["predix-uaa"]
+	if !prs {
+		log.Println(`Error reading "predix-uaa" from VCAP_SERVICES`)
+		return ""
+	}
+	if len(uaa) == 0 {
+		log.Println(`Error reading "predix-uaa" from VCAP_SERVICES: index out of range`)
+		return ""
+	}
+
+	return uaa[0].Credentials.URI
 }

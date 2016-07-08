@@ -1,8 +1,10 @@
-hash: 54f7ceb62873464cd5ab210d2e49bbee2b32a5cb5e1d26c9929e8330a1f66a72
-updated: 2016-07-05T15:49:41.545679671+07:00
+hash: 6a57f9bd3aff46a7048d6967911bc1249a9ed8ff4b16b1ace598397fcdb94dc9
+updated: 2016-07-06T16:25:58.417723528+07:00
 imports:
+- name: github.com/gnhuy91/go-uaa
+  version: 548b85a1e6ef88bf71571e9eaf3bc930e4c543de
 - name: github.com/gnhuy91/go-vcap-parser
-  version: c50a5ab062d71bc28c2afa414907eb6e7ed95d6f
+  version: 3620995c699eb5d16d3e60805191995396952b66
 - name: github.com/gorilla/context
   version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/mux
@@ -12,7 +14,7 @@ imports:
   subpackages:
   - reflectx
 - name: github.com/lib/pq
-  version: 55196ec83d60d789e27b2627549bf00974a70084
+  version: 4dd446efc17690bc53e154025146f73203b18309
   subpackages:
   - oid
 devImports: []
