@@ -334,7 +334,7 @@ func WithMetrics(l *log.Logger, next http.Handler) http.Handler {
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	m := models.Message{Text: "go API, build v0.0.001.992."}
+	m := map[string]interface{}{"text": "go API, build v0.0.001.992."}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(m); err != nil {
