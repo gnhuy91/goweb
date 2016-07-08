@@ -1,37 +1,17 @@
 // Package models contains the types for schema 'public'.
 package models
 
-import "errors"
-
 // UserInfo represents a row from 'public.user_info'.
 type UserInfo struct {
 	ID        int    `db:"id,omitempty" json:"id,omitempty"`
 	FirstName string `db:"first_name" json:"first_name"`
 	LastName  string `db:"last_name" json:"last_name"`
 	Email     string `db:"email" json:"email"`
-
-	// xo fields
-	_exists, _deleted bool
-}
-
-// Exists determines if the UserInfo exists in the database.
-func (ui *UserInfo) Exists() bool {
-	return ui._exists
-}
-
-// Deleted provides information if the UserInfo has been deleted from the database.
-func (ui *UserInfo) Deleted() bool {
-	return ui._deleted
 }
 
 // Insert inserts the UserInfo to the database.
 func (ui *UserInfo) Insert(db DB) error {
 	var err error
-
-	// if already exist, bail
-	if ui._exists {
-		return errors.New("insert failed: already exists")
-	}
 
 	// sql query
 	const sqlstr = `INSERT INTO public.user_info (` +
@@ -47,25 +27,12 @@ func (ui *UserInfo) Insert(db DB) error {
 		return err
 	}
 
-	// set existence
-	ui._exists = true
-
 	return nil
 }
 
 // Update updates the UserInfo in the database.
 func (ui *UserInfo) Update(db DB) error {
 	var err error
-
-	// if doesn't exist, bail
-	if !ui._exists {
-		return errors.New("update failed: does not exist")
-	}
-
-	// if deleted, bail
-	if ui._deleted {
-		return errors.New("update failed: marked for deletion")
-	}
 
 	// sql query
 	const sqlstr = `UPDATE public.user_info SET (` +
@@ -80,25 +47,11 @@ func (ui *UserInfo) Update(db DB) error {
 	return err
 }
 
-// Save saves the UserInfo to the database.
-func (ui *UserInfo) Save(db DB) error {
-	if ui.Exists() {
-		return ui.Update(db)
-	}
-
-	return ui.Insert(db)
-}
-
 // Upsert performs an upsert for UserInfo.
 //
 // NOTE: PostgreSQL 9.5+ only
 func (ui *UserInfo) Upsert(db DB) error {
 	var err error
-
-	// if already exist, bail
-	if ui._exists {
-		return errors.New("insert failed: already exists")
-	}
 
 	// sql query
 	const sqlstr = `INSERT INTO public.user_info (` +
@@ -118,25 +71,12 @@ func (ui *UserInfo) Upsert(db DB) error {
 		return err
 	}
 
-	// set existence
-	ui._exists = true
-
 	return nil
 }
 
 // Delete deletes the UserInfo from the database.
 func (ui *UserInfo) Delete(db DB) error {
 	var err error
-
-	// if doesn't exist, bail
-	if !ui._exists {
-		return nil
-	}
-
-	// if deleted, bail
-	if ui._deleted {
-		return nil
-	}
 
 	// sql query
 	const sqlstr = `DELETE FROM public.user_info WHERE id = $1`
@@ -147,9 +87,6 @@ func (ui *UserInfo) Delete(db DB) error {
 	if err != nil {
 		return err
 	}
-
-	// set deleted
-	ui._deleted = true
 
 	return nil
 }
@@ -168,9 +105,7 @@ func UserInfoByID(db DB, id int) (*UserInfo, error) {
 
 	// run query
 	Log(sqlstr, id)
-	ui := UserInfo{
-		_exists: true,
-	}
+	ui := UserInfo{}
 
 	err = db.QueryRow(sqlstr, id).Scan(&ui.ID, &ui.FirstName, &ui.LastName, &ui.Email)
 	if err != nil {
