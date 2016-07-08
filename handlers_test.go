@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -51,5 +52,58 @@ func TestUserList_StatusOK(t *testing.T) {
 	NewRouter(db).ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK {
 		t.Errorf("%s didn't return %v", url, http.StatusOK)
+	}
+}
+
+func TestInsertUser_ValidBody(t *testing.T) {
+	const (
+		url    = "/user"
+		method = "POST"
+		code   = http.StatusOK
+	)
+
+	bodies := []string{`{
+			"first_name": "Huy",
+			"last_name": "Giang",
+			"email": "abc@mail.com"
+		}`}
+
+	for _, body := range bodies {
+		req, _ := http.NewRequest(method, url, strings.NewReader(body))
+		rec := httptest.NewRecorder()
+
+		errMsg := "%s %s, body: %s - want %v, got %v"
+		errVars := []interface{}{method, url, body, code, rec.Code}
+
+		NewRouter(db).ServeHTTP(rec, req)
+		if rec.Code != code {
+			t.Errorf(errMsg, errVars...)
+		}
+	}
+}
+
+func TestInsertUser_InValidBody(t *testing.T) {
+	const (
+		url    = "/user"
+		method = "POST"
+		code   = http.StatusBadRequest
+	)
+
+	bodies := []string{
+		`{}`,
+		`{"name": "Huy"}`,
+	}
+
+	for _, body := range bodies {
+		req, _ := http.NewRequest(method, url, strings.NewReader(body))
+		rec := httptest.NewRecorder()
+
+		errMsg := "%s %s, body: %s - want %v, got %v"
+		errVars := []interface{}{method, url, body, code, rec.Code}
+
+		NewRouter(db).ServeHTTP(rec, req)
+		if rec.Code != code {
+			t.Errorf(errMsg, errVars...)
+		}
 	}
 }
