@@ -114,3 +114,10 @@ func UserInfoByID(db DB, id int) (*UserInfo, error) {
 
 	return &ui, nil
 }
+
+// UserInfoAll retrieves all rows from 'public.user_info' as []UserInfo.
+func UserInfoAll(db DB) ([]*UserInfo, error) {
+	var users []*UserInfo
+	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
+	return users, err
+}

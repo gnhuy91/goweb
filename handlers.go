@@ -159,7 +159,7 @@ func UserList(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case "GET":
-			users, err := db.GetUsers()
+			users, err := models.UserInfoAll(db)
 			if err != nil {
 				log.Println(err)
 				http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -264,12 +264,6 @@ func (tx *Tx) CreateUsers(m []*models.UserInfo) error {
 	_, err = s.Exec(vals...)
 
 	return err
-}
-
-func (db *DB) GetUsers() ([]*models.UserInfo, error) {
-	var users []*models.UserInfo
-	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
-	return users, err
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!

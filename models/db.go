@@ -11,6 +11,7 @@ type DB interface {
 	Exec(string, ...interface{}) (sql.Result, error)
 	Query(string, ...interface{}) (*sql.Rows, error)
 	QueryRow(string, ...interface{}) *sql.Row
+	Select(dest interface{}, query string, args ...interface{}) error
 	Prepare(string) (*sql.Stmt, error)
 }
 
