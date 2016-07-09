@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"log"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -18,7 +18,7 @@ var db *DB
 func TestMain(m *testing.M) {
 	dbc, err := Connect(dbDriver, configDSN())
 	if err != nil {
-		log.Fatalln(err)
+		panic(err)
 	}
 	// assign to global var so following tests can make use of it
 	db = dbc
@@ -26,23 +26,26 @@ func TestMain(m *testing.M) {
 
 	setup()
 	code := m.Run()
-	shutdown()
+	teardown()
 
 	os.Exit(code)
 }
 
 func setup() {
-	// prepare things here
-
-	// Generate DB Schema
-	log.Println("Generate DB Schema...")
+	fmt.Println("Create DB Schema...")
 	if _, err := db.Exec(schema); err != nil {
-		log.Println(err)
+		fmt.Println(err)
 	}
 }
 
-func shutdown() {
-	// tear-down prepared things here
+func teardown() {
+	fmt.Println("Drop DB Schema...")
+
+	schema := `DROP TABLE user_info`
+	_, err := db.Exec(schema)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
 
 func TestInsertUser_ValidBody(t *testing.T) {
