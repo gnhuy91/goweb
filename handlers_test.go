@@ -32,6 +32,7 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
+	// TODO: use a migration tool here to manage .sql files intead of go vars
 	fmt.Println("Create DB Schema...")
 	if _, err := db.Exec(schema); err != nil {
 		fmt.Println(err)
@@ -39,6 +40,7 @@ func setup() {
 }
 
 func teardown() {
+	// TODO: use a migration tool here to manage .sql files intead of go vars
 	fmt.Println("Drop DB Schema...")
 
 	schema := `DROP TABLE user_info`
