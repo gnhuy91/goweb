@@ -48,7 +48,7 @@ func teardown() {
 	}
 }
 
-func TestInsertUser_ValidBody(t *testing.T) {
+func TestUserInsert_ValidBody(t *testing.T) {
 	const (
 		url    = "/user"
 		method = "POST"
@@ -76,7 +76,7 @@ func TestInsertUser_ValidBody(t *testing.T) {
 	}
 }
 
-func TestInsertUser_InValidBody(t *testing.T) {
+func TestUserInsert_InValidBody(t *testing.T) {
 	const (
 		url    = "/user"
 		method = "POST"
