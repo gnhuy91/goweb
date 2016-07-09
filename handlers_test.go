@@ -45,20 +45,6 @@ func shutdown() {
 	// tear-down prepared things here
 }
 
-func TestUserList_StatusOK(t *testing.T) {
-	url := "/users"
-
-	req, _ := http.NewRequest("GET", url, nil)
-
-	// Use Recorder to record handler's response
-	rec := httptest.NewRecorder()
-
-	NewRouter(db).ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Errorf("%s didn't return %v", url, http.StatusOK)
-	}
-}
-
 func TestInsertUser_ValidBody(t *testing.T) {
 	const (
 		url    = "/user"
@@ -109,6 +95,20 @@ func TestInsertUser_InValidBody(t *testing.T) {
 		if rec.Code != code {
 			t.Errorf(errMsg, errVars...)
 		}
+	}
+}
+
+func TestUserList_StatusOK(t *testing.T) {
+	url := "/users"
+
+	req, _ := http.NewRequest("GET", url, nil)
+
+	// Use Recorder to record handler's response
+	rec := httptest.NewRecorder()
+
+	NewRouter(db).ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Errorf("%s didn't return %v", url, http.StatusOK)
 	}
 }
 
