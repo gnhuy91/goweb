@@ -36,7 +36,7 @@ func UserHandler(db *DB) http.Handler {
 				return
 			}
 
-			user, err := db.GetUserByID(userID)
+			user, err := models.UserInfoByID(db, userID)
 			if err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusNotFound)
@@ -269,12 +269,6 @@ func (db *DB) GetUsers() ([]*models.UserInfo, error) {
 	var users []*models.UserInfo
 	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
 	return users, err
-}
-
-func (db *DB) GetUserByID(userID int) (models.UserInfo, error) {
-	var user models.UserInfo
-	err := db.Get(&user, "SELECT * FROM user_info WHERE id=$1", userID)
-	return user, err
 }
 
 func (tx *Tx) DeleteUserByID(userID int) error {

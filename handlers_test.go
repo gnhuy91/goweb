@@ -102,6 +102,25 @@ func TestInsertUser_InValidBody(t *testing.T) {
 	}
 }
 
+func TestUserByID_StatusOK(t *testing.T) {
+	const (
+		url    = "/user/1"
+		method = "GET"
+		code   = http.StatusOK
+	)
+
+	req, _ := http.NewRequest(method, url, nil)
+	rec := httptest.NewRecorder()
+
+	NewRouter(db).ServeHTTP(rec, req)
+	errMsg := "%s %s, want %v, got %v"
+	errVars := []interface{}{method, url, code, rec.Code}
+
+	if rec.Code != code {
+		t.Errorf(errMsg, errVars...)
+	}
+}
+
 func TestUserList_StatusOK(t *testing.T) {
 	const (
 		url    = "/users"
