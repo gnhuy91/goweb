@@ -59,10 +59,11 @@ func TestInsertUser_ValidBody(t *testing.T) {
 		}`}
 
 	for _, body := range bodies {
-		req, _ := http.NewRequest(method, url, strings.NewReader(body))
-		rec := httptest.NewRecorder()
+		// usage of GenerateHandlerTester, not so useful incase
+		// we need to modified the request headers.
+		tester := GenerateHandlerTester(t, NewRouter(db))
+		rec := tester(method, url, body)
 
-		NewRouter(db).ServeHTTP(rec, req)
 		errMsg := "%s %s, body: %s - want %v, got %v"
 		errVars := []interface{}{method, url, body, code, rec.Code}
 
@@ -99,16 +100,21 @@ func TestInsertUser_InValidBody(t *testing.T) {
 }
 
 func TestUserList_StatusOK(t *testing.T) {
-	url := "/users"
+	const (
+		url    = "/users"
+		method = "GET"
+		code   = http.StatusOK
+	)
 
-	req, _ := http.NewRequest("GET", url, nil)
-
-	// Use Recorder to record handler's response
+	req, _ := http.NewRequest(method, url, nil)
 	rec := httptest.NewRecorder()
 
 	NewRouter(db).ServeHTTP(rec, req)
-	if rec.Code != http.StatusOK {
-		t.Errorf("%s didn't return %v", url, http.StatusOK)
+	errMsg := "%s %s, want %v, got %v"
+	errVars := []interface{}{method, url, code, rec.Code}
+
+	if rec.Code != code {
+		t.Errorf(errMsg, errVars...)
 	}
 }
 
