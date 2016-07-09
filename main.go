@@ -17,14 +17,7 @@ CREATE TABLE user_info (
 	first_name text,
 	last_name text,
 	email text
-);
-
-CREATE TABLE place (
-	id BIGSERIAL PRIMARY KEY,
-	country text,
-	city text NULL,
-	telcode integer
-)`
+);`
 
 // Create our logger
 var logger = log.New(os.Stdout, "", 0)
