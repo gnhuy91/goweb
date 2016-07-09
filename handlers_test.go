@@ -147,7 +147,7 @@ func TestUserUpdate(t *testing.T) {
 	var userFromTest, userFromDB models.UserInfo
 	json.NewDecoder(rec.Body).Decode(&userFromDB)
 
-	// manually assign ID here since PUT get ID from url param, not body
+	// manually assign ID here since PUT get ID from url path, not req body
 	userFromTest.ID = userID
 	json.NewDecoder(strings.NewReader(body)).Decode(&userFromTest)
 
