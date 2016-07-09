@@ -137,7 +137,8 @@ func UserHandler(db *DB) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if err := tx.DeleteUserByID(userID); err != nil {
+			u := models.UserInfo{ID: userID}
+			if err := u.Delete(tx); err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
@@ -269,12 +270,6 @@ func (db *DB) GetUsers() ([]*models.UserInfo, error) {
 	var users []*models.UserInfo
 	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
 	return users, err
-}
-
-func (tx *Tx) DeleteUserByID(userID int) error {
-	// TODO: check if id exist before deleting
-	_, err := tx.Exec(`DELETE FROM user_info WHERE id=$1`, userID)
-	return err
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!

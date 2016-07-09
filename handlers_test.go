@@ -183,3 +183,41 @@ func TestUserUpdate(t *testing.T) {
 		t.Errorf("Update %s went wrong, want %+v, got %+v", url, userFromTest, userFromDB)
 	}
 }
+
+func TestUserDelete_StatusOK(t *testing.T) {
+	const (
+		url    = "/user/1"
+		method = "DELETE"
+		code   = http.StatusOK
+	)
+
+	req, _ := http.NewRequest(method, url, nil)
+	rec := httptest.NewRecorder()
+
+	NewRouter(db).ServeHTTP(rec, req)
+	errMsg := "%s %s, want %v, got %v"
+	errVars := []interface{}{method, url, code, rec.Code}
+
+	if rec.Code != code {
+		t.Errorf(errMsg, errVars...)
+	}
+}
+
+func TestUserDelete_ShouldNotExist(t *testing.T) {
+	const (
+		url    = "/user/1"
+		method = "GET"
+		code   = http.StatusNotFound
+	)
+
+	req, _ := http.NewRequest(method, url, nil)
+	rec := httptest.NewRecorder()
+
+	NewRouter(db).ServeHTTP(rec, req)
+	errMsg := "%s %s, want %v, got %v"
+	errVars := []interface{}{method, url, code, rec.Code}
+
+	if rec.Code != code {
+		t.Errorf(errMsg, errVars...)
+	}
+}
