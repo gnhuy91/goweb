@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -221,5 +222,65 @@ func TestUserDelete_ShouldNotExist(t *testing.T) {
 
 	if rec.Code != code {
 		t.Errorf(errMsg, errVars...)
+	}
+}
+
+func TestUsersInsert(t *testing.T) {
+	// TODO: split this test into 2 tests,
+	// one for StatusOK assertion and one for verifying result.
+	const (
+		url    = "/users"
+		method = "POST"
+		code   = http.StatusOK
+		body   = `[
+			{
+				"first_name": "Huy",
+				"last_name": "Giang",
+				"email": "abc@mail.com"
+			},
+			{
+				"first_name": "John",
+				"last_name": "Doe",
+				"email": "johnd@mail.com"
+			}
+		]`
+	)
+
+	// TRUNCATE is faster than DELETE: https://www.postgresql.org/docs/9.1/static/sql-truncate.html
+	// RESTART IDENTITY reset auto-increment sequences (id column).
+	// if only TRUNCATE table without RESTART IDENTITY,
+	// auto-increment fields will keep their sequences.
+	db.MustExec("TRUNCATE TABLE user_info RESTART IDENTITY")
+
+	req, _ := http.NewRequest(method, url, strings.NewReader(body))
+	rec := httptest.NewRecorder()
+
+	NewRouter(db).ServeHTTP(rec, req)
+	errMsg := "%s %s, body: %s - want %v, got %v"
+	errVars := []interface{}{method, url, body, code, rec.Code}
+
+	if rec.Code != code {
+		t.Errorf(errMsg, errVars...)
+	}
+
+	// Check if the operation took effect by querying /users endpoint
+	// and then compare it with the test body.
+	// Both will be parsed to structs to be able to compare.
+	rec.Flush()
+	req, _ = http.NewRequest("GET", url, nil)
+	NewRouter(db).ServeHTTP(rec, req)
+
+	var usersFromTest, usersFromDB models.Users
+	json.NewDecoder(rec.Body).Decode(&usersFromDB)
+	json.NewDecoder(strings.NewReader(body)).Decode(&usersFromTest)
+	// manually assign ID here since ID is an auto-increment column
+	// and 'id' field should not be included in POST body.
+	for i, u := range usersFromTest {
+		u.ID = i + 1 // i starts from 0 but DB id starts from 1
+	}
+
+	// compare 2 slices, see http://stackoverflow.com/a/15312182/4328963
+	if !reflect.DeepEqual(usersFromTest, usersFromDB) {
+		t.Errorf("%s %s failed, want %+v, got %+v", method, url, usersFromTest, usersFromDB)
 	}
 }

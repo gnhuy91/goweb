@@ -2,12 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/gnhuy91/goweb/models"
@@ -174,7 +172,7 @@ func UserList(db *DB) http.Handler {
 			}
 
 		case "POST":
-			var users []*models.UserInfo
+			var users models.Users
 			err := json.NewDecoder(r.Body).Decode(&users)
 			if err != nil {
 				log.Println(err)
@@ -198,7 +196,7 @@ func UserList(db *DB) http.Handler {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}
-			if err := tx.CreateUsers(users); err != nil {
+			if err := users.Insert(tx); err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
@@ -236,34 +234,6 @@ func (tx *Tx) GenerateData() {
 	// if err != nil {
 	// 	log.Println(err)
 	// }
-}
-
-func (tx *Tx) CreateUsers(m []*models.UserInfo) error {
-	if m == nil {
-		return errors.New("user required")
-	}
-
-	// Build multiple values query
-	query := "INSERT INTO user_info (first_name, last_name, email) VALUES "
-	var (
-		vals []interface{}
-		i    int
-	)
-	for _, row := range m {
-		query += fmt.Sprintf("($%v, $%v, $%v),", i+1, i+2, i+3)
-		i += 3
-		vals = append(vals, row.FirstName, row.LastName, row.Email)
-	}
-	// Remove trailing comma
-	query = strings.TrimSuffix(query, ",")
-
-	s, err := tx.Prepare(query)
-	if err != nil {
-		return err
-	}
-	_, err = s.Exec(vals...)
-
-	return err
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!

@@ -1,6 +1,12 @@
 // Package models contains the types for schema 'public'.
 package models
 
+import (
+	"errors"
+	"fmt"
+	"strings"
+)
+
 // UserInfo represents a row from 'public.user_info'.
 type UserInfo struct {
 	ID        int    `db:"id,omitempty" json:"id,omitempty"`
@@ -8,6 +14,9 @@ type UserInfo struct {
 	LastName  string `db:"last_name" json:"last_name"`
 	Email     string `db:"email" json:"email"`
 }
+
+// Users is for operations on multiple UserInfo at once.
+type Users []*UserInfo
 
 // Insert inserts the UserInfo to the database.
 func (ui *UserInfo) Insert(db DB) error {
@@ -120,4 +129,33 @@ func UserInfoAll(db DB) ([]*UserInfo, error) {
 	var users []*UserInfo
 	err := db.Select(&users, "SELECT * FROM user_info ORDER BY id")
 	return users, err
+}
+
+// Insert multiple UserInfo (Users) at once.
+func (users Users) Insert(db DB) error {
+	if len(users) == 0 {
+		return errors.New("UserInfo slice len is 0")
+	}
+
+	// Build multiple values query
+	query := "INSERT INTO user_info (first_name, last_name, email) VALUES "
+	var vals []interface{}
+
+	var i int // for tracking values counts
+	for _, row := range users {
+		// TODO: find a better way to control i
+		query += fmt.Sprintf("($%v, $%v, $%v),", i+1, i+2, i+3)
+		i += 3
+		vals = append(vals, row.FirstName, row.LastName, row.Email)
+	}
+	// Remove trailing comma
+	query = strings.TrimSuffix(query, ",")
+
+	stmt, err := db.Prepare(query)
+	if err != nil {
+		return err
+	}
+	_, err = stmt.Exec(vals...)
+
+	return err
 }
