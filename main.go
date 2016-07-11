@@ -9,15 +9,9 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
+	_ "github.com/mattes/migrate/driver/postgres"
+	"github.com/mattes/migrate/migrate"
 )
-
-var schema = `
-CREATE TABLE user_info (
-	id BIGSERIAL PRIMARY KEY,
-	first_name text,
-	last_name text,
-	email text
-);`
 
 // Create our logger
 var logger = log.New(os.Stdout, "", 0)
@@ -30,9 +24,13 @@ func main() {
 	defer db.Close()
 
 	// Generate Schema
-	log.Println("Generate DB Schema...")
-	if _, err := db.Exec(schema); err != nil {
-		log.Println(err)
+	log.Println("Ensure DB Schema created ...")
+	allErrors, ok := migrate.UpSync(configDSN(), migrationsDir)
+	if !ok {
+		log.Println("DB migrate Up failed ...")
+		for _, err := range allErrors {
+			log.Println(err)
+		}
 	}
 
 	// r := mux.NewRouter()

@@ -8,7 +8,10 @@ import (
 	"github.com/gnhuy91/go-vcap-parser"
 )
 
-const dbDriver = "postgres"
+const (
+	dbDriver      = "postgres"
+	migrationsDir = "./migrations"
+)
 
 func configPort() string {
 	port := os.Getenv("PORT")

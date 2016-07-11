@@ -12,6 +12,9 @@ import (
 	"testing"
 
 	"github.com/gnhuy91/goweb/models"
+
+	_ "github.com/mattes/migrate/driver/postgres"
+	"github.com/mattes/migrate/migrate"
 )
 
 var db *DB
@@ -33,21 +36,24 @@ func TestMain(m *testing.M) {
 }
 
 func setup() {
-	// TODO: use a migration tool here to manage .sql files intead of go vars
 	fmt.Println("Create DB Schema...")
-	if _, err := db.Exec(schema); err != nil {
-		fmt.Println(err)
+	allErrors, ok := migrate.UpSync(configDSN(), migrationsDir)
+	if !ok {
+		fmt.Println("DB migrate Up failed ...")
+		for _, err := range allErrors {
+			fmt.Println(err)
+		}
 	}
 }
 
 func teardown() {
-	// TODO: use a migration tool here to manage .sql files intead of go vars
 	fmt.Println("Drop DB Schema...")
-
-	schema := `DROP TABLE user_info`
-	_, err := db.Exec(schema)
-	if err != nil {
-		fmt.Println(err)
+	allErrors, ok := migrate.DownSync(configDSN(), migrationsDir)
+	if !ok {
+		fmt.Println("DB migrate Down failed ...")
+		for _, err := range allErrors {
+			fmt.Println(err)
+		}
 	}
 }
 
