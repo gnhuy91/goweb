@@ -3,17 +3,23 @@ package vcapparser
 import "encoding/json"
 
 type Credentials struct {
-	ID         int    `json:"ID"`
-	BindingID  string `json:"binding_id"`
-	Database   string `json:"database"`
-	DSN        string `json:"dsn"`
-	Host       string `json:"host"`
-	InstanceID string `json:"instance_id"`
-	JdbcURI    string `json:"jdbc_uri"`
-	Password   string `json:"password"`
-	Port       string `json:"port"`
-	URI        string `json:"uri"`
-	Username   string `json:"username"`
+	// Genenal field
+	URI string `json:"uri,omitempty"`
+	// Postgres service
+	ID         int    `json:"ID,omitempty"`
+	BindingID  string `json:"binding_id,omitempty"`
+	Database   string `json:"database,omitempty"`
+	DSN        string `json:"dsn,omitempty"`
+	Host       string `json:"host,omitempty"`
+	InstanceID string `json:"instance_id,omitempty"`
+	JdbcURI    string `json:"jdbc_uri,omitempty"`
+	Password   string `json:"password,omitempty"`
+	Port       string `json:"port,omitempty"`
+	Username   string `json:"username,omitempty"`
+	// UAA service
+	IssuerID  string            `json:"issuerId,omitempty"`
+	Subdomain string            `json:"subdomain,omitempty"`
+	Zone      map[string]string `json:"zone,omitempty"`
 }
 
 type VcapService struct {
