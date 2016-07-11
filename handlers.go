@@ -2,10 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gnhuy91/goweb/models"
@@ -23,43 +23,189 @@ func (db *DB) Begin() (*Tx, error) {
 
 func UserHandler(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var u models.User
-		err := json.NewDecoder(r.Body).Decode(&u)
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		if u == (models.User{}) {
-			http.Error(w, "user is empty", http.StatusBadRequest)
-			return
-		}
+		switch r.Method {
+		case "GET":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
 
-		tx, err := db.Begin()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+			user, err := models.UserInfoByID(db, userID)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusNotFound)
+				return
+			}
+
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			if err := json.NewEncoder(w).Encode(user); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+
+		case "POST":
+			var u models.UserInfo
+			err := json.NewDecoder(r.Body).Decode(&u)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
+			if u == (models.UserInfo{}) {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			err = u.Insert(tx)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			err = tx.Commit()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		case "PUT":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
+
+			// Parse body
+			var u models.UserInfo
+			if err := json.NewDecoder(r.Body).Decode(&u); err != nil {
+				log.Println(err)
+				http.Error(w, "unknown format", http.StatusBadRequest)
+				return
+			}
+			if u == (models.UserInfo{}) {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			u.ID = userID
+			if err := u.Update(tx); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		case "DELETE":
+			vars := mux.Vars(r)
+			userIDStr := vars["id"]
+			userID, err := strconv.Atoi(userIDStr)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, "invalid user id", http.StatusBadRequest)
+				return
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			u := models.UserInfo{ID: userID}
+			if err := u.Delete(tx); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+
+		default:
+			w.WriteHeader(http.StatusNotFound)
 		}
-		tx.CreateUser(&u)
-		tx.Commit()
 	})
 }
 
 func UserList(db *DB) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		users, err := db.GetUsers()
-		if err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(http.StatusOK)
-		if err := json.NewEncoder(w).Encode(users); err != nil {
-			log.Println(err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
+		switch r.Method {
+		case "GET":
+			users, err := models.UserInfoAll(db)
+			if err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+			w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+			w.WriteHeader(http.StatusOK)
+			if err := json.NewEncoder(w).Encode(users); err != nil {
+				log.Println(err)
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+				return
+			}
+
+		case "POST":
+			var users models.Users
+			err := json.NewDecoder(r.Body).Decode(&users)
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			// simple data validation
+			if users == nil || len(users) == 0 {
+				http.Error(w, "user is empty", http.StatusBadRequest)
+				return
+			}
+			for _, u := range users {
+				if u == nil || u.Email == "" || u.FirstName == "" || u.LastName == "" {
+					w.WriteHeader(http.StatusBadRequest)
+				}
+			}
+
+			tx, err := db.Begin()
+			if err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := users.Insert(tx); err != nil {
+				log.Println(err)
+				w.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			if err := tx.Commit(); err != nil {
+				log.Println(err)
+				tx.Rollback()
+				w.WriteHeader(http.StatusInternalServerError)
+			}
 		}
 	})
 }
@@ -88,22 +234,6 @@ func (tx *Tx) GenerateData() {
 	// if err != nil {
 	// 	log.Println(err)
 	// }
-}
-
-// CreateUser create a user in the db
-func (tx *Tx) CreateUser(m *models.User) error {
-	// Validate the input
-	if m == nil {
-		return errors.New("user required")
-	}
-	_, err := tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", m.FirstName, m.LastName, m.Email)
-	return err
-}
-
-func (db *DB) GetUsers() ([]*models.User, error) {
-	var users []*models.User
-	err := db.Select(&users, "SELECT * FROM user_info")
-	return users, err
 }
 
 // my version copied from tsenart's, looks like more of a mess but it works!
@@ -141,7 +271,7 @@ func WithMetrics(l *log.Logger, next http.Handler) http.Handler {
 }
 
 func About(w http.ResponseWriter, r *http.Request) {
-	m := models.Message{Text: "go API, build v0.0.001.992."}
+	m := map[string]interface{}{"text": "go API, build v0.0.001.992."}
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	w.WriteHeader(http.StatusOK)
 	if err := json.NewEncoder(w).Encode(m); err != nil {
