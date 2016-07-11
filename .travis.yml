@@ -16,6 +16,8 @@ env:
     POSTGRES_PASSWORD=""
     POSTGRES_DB=travis_ci_test
 
+install: true
+
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
 
