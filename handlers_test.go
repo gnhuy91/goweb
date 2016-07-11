@@ -236,6 +236,7 @@ func TestUsersInsert(t *testing.T) {
 	json.NewDecoder(strings.NewReader(body)).Decode(&usersFromTest)
 	// manually assign ID here since ID is an auto-increment column
 	// and 'id' field should not be included in POST body.
+	// Thanks to RESTART IDENTITY to make id count predictable as below.
 	for i, u := range usersFromTest {
 		u.ID = i + 1 // i starts from 0 but DB id starts from 1
 	}
