@@ -1,5 +1,5 @@
 IMAGE=gnhuy91/goweb
-DCR=docker-compose run --rm -T
+DCR=docker-compose run --rm
 
 POSTGRES_HOST?=127.0.0.1:5432
 POSTGRES_USER?=postgres
