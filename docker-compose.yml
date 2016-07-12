@@ -5,7 +5,7 @@ services:
     image: golang
     working_dir: /go/src/github.com/gnhuy91/goweb
     volumes:
-      - $GOPATH:/go
+      - .:/go/src/github.com/gnhuy91/goweb
     ports:
       - "8080:8080"
     links:
