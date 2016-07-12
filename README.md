@@ -4,53 +4,46 @@
 
 ### Local development
 
-- Install [`glide`](https://github.com/Masterminds/glide) - Go package management tool
-
-- Install dependencies
+- Run tests
 
 ```console
-glide install -s
+make test
 ```
 
-- Prepare env
+- Build app binary (this output `goweb` binary in `bin/`)
+
+```console
+make build
+```
+
+- Run the app
 
 ```sh
+# Prepare env
 export POSTGRES_HOST=127.0.0.1:5432
 export POSTGRES_USER=postgres
 export POSTGRES_PASSWORD=mypostgres
 export POSTGRES_DB=users
-export PORT=8080
-```
+export PORT=8080  # goweb's listen port
 
-- Start a `postgres` container
-
-```console
+# Start a postgres container
 docker run -d --name=pg \
     -p 5432:5432 \
     -e POSTGRES_USER=$POSTGRES_USER \
     -e POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
     -e POSTGRES_DB=$POSTGRES_DB \
     postgres
-```
 
-- Building (for *alpine*)
-
-```console
-GOOS=linux GOARCH=amd64 CGO_ENABLED=0 go build -o bin/goweb
-```
-
-- Run the app
-
-```console
-bin/goweb
+# Run the app
+make run
 ```
 
 ### Deploy to Cloud Foundry
 
-- Build the app
+- Build app binary
 
 ```console
-go build -o bin/goweb
+make build
 ```
 
 - Push to Cloud Foundry
