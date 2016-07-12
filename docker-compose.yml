@@ -1,6 +1,15 @@
 version: '2'
 services:
 
+  db:
+    image: postgres
+    ports:
+      - '5432'
+    environment: &env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
   go: &go
     image: golang
     working_dir: /go/src/github.com/gnhuy91/goweb
@@ -9,10 +18,8 @@ services:
     links:
       - db
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_HOST=db
+      <<: *env
+      POSTGRES_HOST: db
 
   go-test:
     <<: *go
@@ -29,12 +36,3 @@ services:
     image: gnhuy91/goweb
     ports:
       - '8080:8080'
-
-  db:
-    image: postgres
-    ports:
-      - '5432'
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
