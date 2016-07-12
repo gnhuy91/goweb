@@ -7,7 +7,7 @@ services:
     volumes:
       - .:/go/src/github.com/gnhuy91/goweb
     ports:
-      - "8080:8080"
+      - 8080:8080
     links:
       - db
     environment:
@@ -29,7 +29,7 @@ services:
   db:
     image: postgres
     ports:
-      - "5432"
+      - 5432
     environment:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
