@@ -16,7 +16,13 @@ make test
 make build
 ```
 
-- Run the app
+- Run the app (in docker container)
+
+```console
+make run-docker
+```
+
+- Run the app's binary, this requires a **PostgreSQL** instance
 
 ```sh
 # Prepare env
@@ -26,7 +32,7 @@ export POSTGRES_PASSWORD=mypostgres
 export POSTGRES_DB=users
 export PORT=8080  # goweb's listen port
 
-# Start a postgres container
+# Start a postgres container (or spin up your own instance here)
 docker run -d --name=pg \
     -p 5432:5432 \
     -e POSTGRES_USER=$POSTGRES_USER \
@@ -34,7 +40,7 @@ docker run -d --name=pg \
     -e POSTGRES_DB=$POSTGRES_DB \
     postgres
 
-# Run the app
+# Run the binary
 make run
 ```
 
