@@ -23,10 +23,11 @@ CREATE TABLE IF NOT EXISTS user_info (
 );`
 
 func main() {
-	db, err := Connect(dbDriver, configDSN())
+	db, err := RetryConnect(dbDriver, configDSN(), dbConnRetryCount)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Failed to connect to DB after %v attempts - %s", dbConnRetryCount, err)
 	}
+	log.Println("DB connect successful")
 	defer db.Close()
 
 	// Generate Schema

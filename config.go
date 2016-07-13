@@ -9,8 +9,9 @@ import (
 )
 
 const (
-	dbDriver      = "postgres"
-	migrationsDir = "./migrations"
+	dbDriver         = "postgres"
+	migrationsDir    = "./migrations"
+	dbConnRetryCount = 5
 )
 
 func configPort() string {

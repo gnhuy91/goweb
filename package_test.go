@@ -15,10 +15,11 @@ import (
 var db *DB
 
 func TestMain(m *testing.M) {
-	dbc, err := Connect(dbDriver, configDSN())
+	dbc, err := RetryConnect(dbDriver, configDSN(), dbConnRetryCount)
 	if err != nil {
-		panic(err)
+		panic(fmt.Sprintf("Failed to connect to DB after %v attempts - %s", dbConnRetryCount, err))
 	}
+	fmt.Println("DB connect successful")
 	// assign to global var so following tests can make use of it
 	db = dbc
 	defer db.Close()

@@ -1,6 +1,10 @@
 package main
 
-import "github.com/jmoiron/sqlx"
+import (
+	"time"
+
+	"github.com/jmoiron/sqlx"
+)
 
 // DB do something
 type DB struct {
@@ -28,4 +32,19 @@ func Connect(dataDriver, dataSourceName string) (*DB, error) {
 		return nil, err
 	}
 	return &DB{db}, nil
+}
+
+// RetryConnect perform retrying db Connect if failed by 'retryCount' times,
+// wait 1 second between each retry.
+func RetryConnect(dataDriver, dataSourceName string, retryCount int) (*DB, error) {
+	db, err := Connect(dataDriver, dataSourceName)
+	for retryCount > 0 {
+		if err != nil {
+			retryCount--
+			time.Sleep(time.Second)
+			return RetryConnect(dataDriver, dataSourceName, retryCount)
+		}
+		break
+	}
+	return db, err
 }
