@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -226,32 +225,6 @@ func GenDataHandler(db *DB) http.Handler {
 func (tx *Tx) GenerateData() {
 	tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", "Jason", "Moiron", "jmoiron@jmoiron.net")
 	tx.Exec("INSERT INTO user_info (first_name, last_name, email) VALUES ($1, $2, $3)", "John", "Doe", "johndoeDNE@gmail.net")
-}
-
-// my version copied from tsenart's, looks like more of a mess but it works!
-func WelcomeHandler(config string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		name := vars["name"]
-		fmt.Fprintf(w, "Welcome!, config: %s, user: %s", config, name)
-	}
-}
-
-func Middleware(l *log.Logger, next func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		began := time.Now()
-		next(w, r)
-		l.Printf("%s: %s %s took %s", time.Now(), r.Method, r.URL, time.Since(began))
-	}
-}
-
-// took from the awesome: https://gist.github.com/tsenart/5fc18c659814c078378d
-func MyUserHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		name := vars["name"]
-		fmt.Fprintf(w, "user: %s", name)
-	})
 }
 
 func WithMetrics(l *log.Logger, next http.Handler) http.Handler {

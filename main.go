@@ -37,23 +37,7 @@ func main() {
 		log.Println(err)
 	}
 
-	// r := mux.NewRouter()
-
-	// // my version of 'HTTP closure'
-	// config := "my config"
-	// r.HandleFunc("/welcome/{name}", WelcomeHandler(config))
-	// r.HandleFunc("/_welcome/{name}", Middleware(logger, WelcomeHandler(config)))
-
-	// // hanlder with no closure
-	// r.HandleFunc("/about", About)
-
-	// r.Handle("/users", UserList(db)).Methods("GET", "HEAD")
-	// r.Handle("/user", UserHandler(db)).Methods("POST")
-
-	// r.Handle("/gendata", GenDataHandler(db)).Methods("GET")
-
-	// log.Fatal(http.ListenAndServe(":8080", r))
-
+	// Init the router
 	r := NewRouter(db)
 	log.Fatal(http.ListenAndServe(port, r))
 }
