@@ -28,8 +28,13 @@ run:
 
 release: test build docker-build docker-push
 
+run-docker: build docker-build docker-run
+
 docker-build:
 	docker build --rm -t $(IMAGE) .
 
 docker-push:
 	docker push $(IMAGE)
+
+docker-run:
+	$(DCR) --service-ports go-run
