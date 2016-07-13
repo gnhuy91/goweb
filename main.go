@@ -9,28 +9,32 @@ import (
 	"os"
 
 	_ "github.com/lib/pq"
-	_ "github.com/mattes/migrate/driver/postgres"
-	"github.com/mattes/migrate/migrate"
 )
 
 // Create our logger
 var logger = log.New(os.Stdout, "", 0)
 
+const schema = `
+CREATE TABLE IF NOT EXISTS user_info (
+	id BIGSERIAL PRIMARY KEY,
+	first_name text,
+	last_name text,
+	email text
+);`
+
 func main() {
-	db, err := Connect(dbDriver, configDSN())
+	db, err := RetryConnect(dbDriver, configDSN(), dbConnRetryCount)
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("Failed to connect to DB after %v attempts - %s", dbConnRetryCount, err)
 	}
+	log.Println("DB connect successful")
 	defer db.Close()
 
 	// Generate Schema
 	log.Println("Ensure DB Schema created ...")
-	allErrors, ok := migrate.UpSync(configDSN(), migrationsDir)
-	if !ok {
-		log.Println("DB migrate Up failed ...")
-		for _, err := range allErrors {
-			log.Println(err)
-		}
+	_, err = db.Exec(schema)
+	if err != nil {
+		log.Println(err)
 	}
 
 	// r := mux.NewRouter()

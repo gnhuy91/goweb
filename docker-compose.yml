@@ -1,26 +1,44 @@
 version: '2'
 services:
-  web:
-    restart: on-failure:10
-    image: alpine
-    command: /app/goweb
-    volumes:
-      - ./goweb:/app/goweb
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
-      - POSTGRES_HOST=db
 
   db:
     image: postgres
     ports:
-      - "5432"
+      - '5432'
+    environment: &env
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+  go: &go
+    image: golang
+    working_dir: /go/src/github.com/gnhuy91/goweb
+    volumes:
+      - .:/go/src/github.com/gnhuy91/goweb
+    links:
+      - db
     environment:
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      <<: *env
+      POSTGRES_HOST: db
+
+  go-test:
+    <<: *go
+    command: go test -v
+
+  go-build:
+    <<: *go
+    command: sh -c 'rm -f bin/goweb && go build -o bin/goweb'
+    links: []
+    environment:
+      CGO_ENABLED: 0
+
+  go-run:
+    build: .
+    image: gnhuy91/goweb
+    ports:
+      - '8080:8080'
+    links:
+      - db
+    environment:
+      <<: *env
+      POSTGRES_HOST: db
