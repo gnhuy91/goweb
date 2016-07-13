@@ -28,6 +28,7 @@ services:
   go-build:
     <<: *go
     command: sh -c 'rm -f bin/goweb && go build -o bin/goweb'
+    links: []
     environment:
       CGO_ENABLED: 0
 
