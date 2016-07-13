@@ -10,21 +10,18 @@
 make test
 ```
 
-- Build app binary (this output `goweb` binary in `bin/`)
-
-```console
-make build
-```
-
-- Run the app (in docker container)
+- Run the app (in docker container), if you prefer to run the app without docker, skip to the next step
 
 ```console
 make run-docker
 ```
 
-- Run the app's binary, this requires a **PostgreSQL** instance
+- Build & run the app's binary, this requires a **PostgreSQL** instance
 
 ```sh
+# Build app binary (this output `goweb` binary in `bin` folder)
+make build
+
 # Prepare env
 export POSTGRES_HOST=127.0.0.1:5432
 export POSTGRES_USER=postgres
