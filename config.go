@@ -14,6 +14,11 @@ const (
 	dbConnRetryCount = 5
 )
 
+var (
+	port = configPort()
+	dsn  = configDSN()
+)
+
 func configPort() string {
 	port := os.Getenv("PORT")
 	if port == "" {

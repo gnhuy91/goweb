@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS user_info (
 );`
 
 func main() {
-	db, err := RetryConnect(dbDriver, configDSN(), dbConnRetryCount)
+	db, err := RetryConnect(dbDriver, dsn, dbConnRetryCount)
 	if err != nil {
 		log.Fatalf("Failed to connect to DB after %v attempts - %s", dbConnRetryCount, err)
 	}
@@ -55,5 +55,5 @@ func main() {
 	// log.Fatal(http.ListenAndServe(":8080", r))
 
 	r := NewRouter(db)
-	log.Fatal(http.ListenAndServe(configPort(), r))
+	log.Fatal(http.ListenAndServe(port, r))
 }

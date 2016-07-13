@@ -15,7 +15,7 @@ import (
 var db *DB
 
 func TestMain(m *testing.M) {
-	dbc, err := RetryConnect(dbDriver, configDSN(), dbConnRetryCount)
+	dbc, err := RetryConnect(dbDriver, dsn, dbConnRetryCount)
 	if err != nil {
 		panic(fmt.Sprintf("Failed to connect to DB after %v attempts - %s", dbConnRetryCount, err))
 	}
@@ -35,7 +35,7 @@ func setup() {
 	fmt.Println("Create DB Schema...")
 
 	p := pipe.New()
-	go migrate.Up(p, configDSN(), migrationsDir)
+	go migrate.Up(p, dsn, migrationsDir)
 	ok := writePipe(p)
 	if !ok {
 		panic("DB migrate Up failed.")
@@ -46,7 +46,7 @@ func teardown() {
 	fmt.Println("\nDrop DB Schema...")
 
 	p := pipe.New()
-	go migrate.Down(p, configDSN(), migrationsDir)
+	go migrate.Down(p, dsn, migrationsDir)
 	ok := writePipe(p)
 	if !ok {
 		panic("DB migrate Down failed.")
