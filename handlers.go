@@ -107,7 +107,7 @@ func UserHandler(db *DB) http.Handler {
 				return
 			}
 			u.ID = userID
-			if err := u.Update(tx); err != nil {
+			if err := u.Upsert(tx); err != nil {
 				log.Println(err)
 				w.WriteHeader(http.StatusInternalServerError)
 				return
