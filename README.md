@@ -43,14 +43,6 @@ make run
 
 ### Deploy to Cloud Foundry
 
-- Build app binary
-
 ```console
-make build
-```
-
-- Push to Cloud Foundry
-
-```console
-cf push -f manifest.yml
+make cf
 ```

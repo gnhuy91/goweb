@@ -30,6 +30,8 @@ release: test build docker-build docker-push
 
 run-docker: build docker-build docker-run
 
+cf: build cf-push
+
 docker-build:
 	docker build --rm -t $(IMAGE) .
 
@@ -38,3 +40,6 @@ docker-push:
 
 docker-run:
 	$(DCR) --service-ports go-run
+
+cf-push:
+	cf push -f manifest.yml
