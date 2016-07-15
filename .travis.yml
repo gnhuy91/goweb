@@ -23,7 +23,7 @@ env:
     - PGPORT=5433
     - PGHOST=localhost
     - GO15VENDOREXPERIMENT=1
-    - POSTGRES_HOST=127.0.0.1:5432
+    - POSTGRES_HOST=$PGHOST:$PGPORT
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=""
     - POSTGRES_DB=travis_ci_test
