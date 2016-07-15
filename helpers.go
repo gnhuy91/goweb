@@ -8,11 +8,22 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
+	"path"
 	"path/filepath"
 	"strings"
 	"testing"
 )
+
+func concatURL(baseURL string, params ...string) (string, error) {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return "", err
+	}
+	u.Path = path.Join(append([]string{u.Path}, params...)...)
+	return u.String(), nil
+}
 
 // HandlerTester returns an httptest.ResponseRecorder,
 // given a method type ("GET", "POST", etc), request url and parameters,
