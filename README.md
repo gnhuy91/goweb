@@ -1,4 +1,4 @@
-# goweb [![Build Status](https://travis-ci.org/gnhuy91/goweb.svg?branch=travis-test)](https://travis-ci.org/gnhuy91/goweb)
+# goweb [![Build Status](https://travis-ci.org/gnhuy91/goweb.svg?branch=develop)](https://travis-ci.org/gnhuy91/goweb) [![GoDoc](https://godoc.org/github.com/gnhuy91/goweb?status.svg)](http://godoc.org/github.com/gnhuy91/goweb)
 
 ## Instruction
 
