@@ -1,4 +1,3 @@
-// Package models contains the types for schema 'public'.
 package models
 
 import (
