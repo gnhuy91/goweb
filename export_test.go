@@ -6,7 +6,4 @@ const (
 	DBConnRetryCount = dbConnRetryCount
 )
 
-var (
-	Port = configPort()
-	DSN  = configDSN()
-)
+var DSN = configDSN()
