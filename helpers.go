@@ -16,7 +16,8 @@ import (
 	"testing"
 )
 
-func concatURL(baseURL string, params ...string) (string, error) {
+// ConcatURL concat params to baseURL and return a full URL string
+func ConcatURL(baseURL string, params ...string) (string, error) {
 	u, err := url.Parse(baseURL)
 	if err != nil {
 		return "", err
@@ -55,7 +56,7 @@ func GenerateHandlerTester(t *testing.T, handleFunc http.Handler) HandlerTester 
 // From Matt Aimonetti's blog post:
 // matt.aimonetti.net/posts/2013/07/01/golang-multipart-file-upload-example/
 // Creates a new file upload http request with optional extra params.
-func newFileUploadRequest(paramName, path string, params map[string]string) (*http.Request, error) {
+func NewFileUploadRequest(paramName, path string, params map[string]string) (*http.Request, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return nil, err
