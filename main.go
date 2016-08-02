@@ -11,9 +11,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-// Create our logger
-var logger = log.New(os.Stdout, "", 0)
-
 const schema = `
 CREATE TABLE IF NOT EXISTS user_info (
 	id BIGSERIAL PRIMARY KEY,
@@ -37,7 +34,10 @@ func main() {
 		log.Println(err)
 	}
 
+	// Create our logger
+	logger := log.New(os.Stderr, "", 0)
+
 	// Init the router
-	r := NewRouter(db)
+	r := NewRouter(db, logger)
 	log.Fatal(http.ListenAndServe(port, r))
 }

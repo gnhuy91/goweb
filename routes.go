@@ -1,6 +1,9 @@
 package main
 
-import "net/http"
+import (
+	"log"
+	"net/http"
+)
 
 type Route struct {
 	Name    string
@@ -14,7 +17,7 @@ type Route struct {
 
 type Routes []Route
 
-func routes(db *DB) Routes {
+func routes(db *DB, logger *log.Logger) Routes {
 	return Routes{
 		Route{
 			"Index",

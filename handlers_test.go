@@ -40,7 +40,7 @@ func TestUserInsert_ValidBody(t *testing.T) {
 	for _, body := range bodies {
 		// usage of GenerateHandlerTester, not so useful incase
 		// we need to modified the request headers.
-		tester := GenerateHandlerTester(t, NewRouter(db))
+		tester := GenerateHandlerTester(t, NewRouter(db, logger))
 		rec := tester(method, url, body)
 
 		errMsg := "%s %s, body: %s - want %v, got %v"
@@ -68,7 +68,7 @@ func TestUserInsert_InValidBody(t *testing.T) {
 		req, _ := http.NewRequest(method, url, strings.NewReader(body))
 		rec := httptest.NewRecorder()
 
-		NewRouter(db).ServeHTTP(rec, req)
+		NewRouter(db, logger).ServeHTTP(rec, req)
 		errMsg := "%s %s, body: %s - want %v, got %v"
 		errVars := []interface{}{method, url, body, code, rec.Code}
 
@@ -84,7 +84,7 @@ func TestUserByID_StatusOK(t *testing.T) {
 	req, _ := http.NewRequest(p.Method, p.ReqURL(), nil)
 	rec := httptest.NewRecorder()
 
-	NewRouter(db).ServeHTTP(rec, req)
+	NewRouter(db, logger).ServeHTTP(rec, req)
 	errMsg := "%s %s, want %v, got %v"
 	errVars := []interface{}{p.Method, p.ReqURL(), p.Code, rec.Code}
 
@@ -103,7 +103,7 @@ func TestUserList_StatusOK(t *testing.T) {
 	req, _ := http.NewRequest(method, url, nil)
 	rec := httptest.NewRecorder()
 
-	NewRouter(db).ServeHTTP(rec, req)
+	NewRouter(db, logger).ServeHTTP(rec, req)
 	errMsg := "%s %s, want %v, got %v"
 	errVars := []interface{}{method, url, code, rec.Code}
 
@@ -134,7 +134,7 @@ func TestUserUpdate(t *testing.T) {
 		req, _ := http.NewRequest(p.Method, p.ReqURL(), strings.NewReader(body))
 		rec := httptest.NewRecorder()
 
-		NewRouter(db).ServeHTTP(rec, req)
+		NewRouter(db, logger).ServeHTTP(rec, req)
 		errMsg := "%s %s, body: %s - want %v, got %v"
 		errVars := []interface{}{p.Method, p.ReqURL(), body, p.Code, rec.Code}
 
@@ -147,7 +147,7 @@ func TestUserUpdate(t *testing.T) {
 		// Both should be parsed to the struct to be able to compare.
 		rec.Flush()
 		req, _ = http.NewRequest("GET", p.ReqURL(), nil)
-		NewRouter(db).ServeHTTP(rec, req)
+		NewRouter(db, logger).ServeHTTP(rec, req)
 
 		var userFromTest, userFromDB models.UserInfo
 		json.NewDecoder(rec.Body).Decode(&userFromDB)
@@ -172,7 +172,7 @@ func TestUserDelete_StatusOK(t *testing.T) {
 	req, _ := http.NewRequest(method, url, nil)
 	rec := httptest.NewRecorder()
 
-	NewRouter(db).ServeHTTP(rec, req)
+	NewRouter(db, logger).ServeHTTP(rec, req)
 	errMsg := "%s %s, want %v, got %v"
 	errVars := []interface{}{method, url, code, rec.Code}
 
@@ -191,7 +191,7 @@ func TestUserDelete_ShouldNotExist(t *testing.T) {
 	req, _ := http.NewRequest(method, url, nil)
 	rec := httptest.NewRecorder()
 
-	NewRouter(db).ServeHTTP(rec, req)
+	NewRouter(db, logger).ServeHTTP(rec, req)
 	errMsg := "%s %s, want %v, got %v"
 	errVars := []interface{}{method, url, code, rec.Code}
 
@@ -230,7 +230,7 @@ func TestUsersInsert(t *testing.T) {
 	req, _ := http.NewRequest(method, url, strings.NewReader(body))
 	rec := httptest.NewRecorder()
 
-	NewRouter(db).ServeHTTP(rec, req)
+	NewRouter(db, logger).ServeHTTP(rec, req)
 	errMsg := "%s %s, body: %s - want %v, got %v"
 	errVars := []interface{}{method, url, body, code, rec.Code}
 
@@ -243,7 +243,7 @@ func TestUsersInsert(t *testing.T) {
 	// Both will be parsed to structs to be able to compare.
 	rec.Flush()
 	req, _ = http.NewRequest("GET", url, nil)
-	NewRouter(db).ServeHTTP(rec, req)
+	NewRouter(db, logger).ServeHTTP(rec, req)
 
 	var usersFromTest, usersFromDB models.Users
 	json.NewDecoder(rec.Body).Decode(&usersFromDB)

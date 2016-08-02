@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"testing"
 
@@ -12,7 +13,10 @@ import (
 	"github.com/mattes/migrate/pipe"
 )
 
-var db *DB
+var (
+	db     *DB
+	logger = log.New(os.Stderr, "", 0)
+)
 
 func TestMain(m *testing.M) {
 	dbc, err := RetryConnect(dbDriver, dsn, dbConnRetryCount)
