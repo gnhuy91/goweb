@@ -1,4 +1,4 @@
-package main
+package main_test
 
 import (
 	"fmt"
@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	svc "github.com/gnhuy91/goweb"
 	_ "github.com/mattes/migrate/driver/postgres"
 	"github.com/mattes/migrate/file"
 	"github.com/mattes/migrate/migrate"
@@ -14,14 +15,14 @@ import (
 )
 
 var (
-	db     *DB
+	db     *svc.DB
 	logger = log.New(os.Stderr, "", 0)
 )
 
 func TestMain(m *testing.M) {
-	dbc, err := RetryConnect(dbDriver, dsn, dbConnRetryCount)
+	dbc, err := svc.RetryConnect(svc.DBDriver, svc.DSN, svc.DBConnRetryCount)
 	if err != nil {
-		panic(fmt.Sprintf("Failed to connect to DB after %v attempts - %s", dbConnRetryCount, err))
+		panic(fmt.Sprintf("Failed to connect to DB after %v attempts - %s", svc.DBConnRetryCount, err))
 	}
 	fmt.Println("DB connect successful")
 	// assign to global var so following tests can make use of it
@@ -39,7 +40,7 @@ func setup() {
 	fmt.Println("Create DB Schema...")
 
 	p := pipe.New()
-	go migrate.Up(p, dsn, migrationsDir)
+	go migrate.Up(p, svc.DSN, svc.MigrationsDir)
 	ok := writePipe(p)
 	if !ok {
 		panic("DB migrate Up failed.")
@@ -50,7 +51,7 @@ func teardown() {
 	fmt.Println("\nDrop DB Schema...")
 
 	p := pipe.New()
-	go migrate.Down(p, dsn, migrationsDir)
+	go migrate.Down(p, svc.DSN, svc.MigrationsDir)
 	ok := writePipe(p)
 	if !ok {
 		panic("DB migrate Down failed.")
