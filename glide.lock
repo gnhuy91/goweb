@@ -1,20 +1,20 @@
 hash: 6a57f9bd3aff46a7048d6967911bc1249a9ed8ff4b16b1ace598397fcdb94dc9
-updated: 2016-07-06T16:25:58.417723528+07:00
+updated: 2016-08-04T11:02:34.128836186+07:00
 imports:
 - name: github.com/gnhuy91/go-uaa
-  version: 548b85a1e6ef88bf71571e9eaf3bc930e4c543de
+  version: 3198aa76d4ca2ad28a79e86797f3eee5e6210bf5
 - name: github.com/gnhuy91/go-vcap-parser
   version: 3620995c699eb5d16d3e60805191995396952b66
 - name: github.com/gorilla/context
   version: aed02d124ae4a0e94fea4541c8effd05bf0c8296
 - name: github.com/gorilla/mux
-  version: 9fa818a44c2bf1396a17f9d5a3c0f6dd39d2ff8e
+  version: 780415097119f6f61c55475fe59b66f3c3e9ea53
 - name: github.com/jmoiron/sqlx
-  version: bdae0c3219c3bdb92f3d7c70825018712787c933
+  version: 7396209bbeada6a4fcc28aa9408f89b2e71cac39
   subpackages:
   - reflectx
 - name: github.com/lib/pq
   version: 4dd446efc17690bc53e154025146f73203b18309
   subpackages:
   - oid
-devImports: []
+testImports: []
