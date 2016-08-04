@@ -300,6 +300,9 @@ func (tx *Tx) DeleteUserByID(userID int) error {
 	return err
 }
 
+// WithUAA is a middleware that protect the wrapped enpoint from unauthorized
+// requests, it takes auth token from request header and verify
+// if the token is valid.
 func WithUAA(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if uaaURI != "" {
@@ -307,12 +310,12 @@ func WithUAA(next http.Handler) http.Handler {
 			authStr := r.Header.Get("Authorization")
 
 			// Check if token is valid
-			checkStatusCode, err := uaa.CheckUAAToken(uaaCheckTokenURI, authStr)
+			statusCode, err := uaa.VerifyToken(uaaCheckTokenURI, authStr)
 
 			// Only valid token can process the request
-			if checkStatusCode != http.StatusOK {
+			if statusCode != http.StatusOK {
 				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-				w.WriteHeader(checkStatusCode)
+				w.WriteHeader(statusCode)
 				m := map[string]string{"error": err.Error()}
 				if err := json.NewEncoder(w).Encode(m); err != nil {
 					log.Println(err)
