@@ -312,17 +312,16 @@ func WithUAA(next http.Handler) http.Handler {
 			// Check if token is valid
 			statusCode, err := uaa.VerifyToken(uaaCheckTokenURI, authStr)
 
-			// Only valid token can process the request
+			// Cancel the request if the token is invalid
 			if statusCode != http.StatusOK {
 				w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 				w.WriteHeader(statusCode)
 				m := map[string]string{"error": err.Error()}
-				if err := json.NewEncoder(w).Encode(m); err != nil {
-					log.Println(err)
-				}
+				json.NewEncoder(w).Encode(m)
 				return
 			}
 		}
+		// Only valid token can process the request
 		next.ServeHTTP(w, r)
 	})
 }
