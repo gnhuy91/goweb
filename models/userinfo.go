@@ -17,6 +17,9 @@ type UserInfo struct {
 // Users is for operations on multiple UserInfo at once.
 type Users []*UserInfo
 
+// ErrNilRow is returned when QueryRow returns nil
+var ErrNilRow = errors.New("no rows returned")
+
 // Insert inserts the UserInfo to the database.
 func (ui *UserInfo) Insert(db DB) error {
 	var err error
@@ -28,9 +31,13 @@ func (ui *UserInfo) Insert(db DB) error {
 		`$1, $2, $3` +
 		`) RETURNING id`
 
-	// run query
 	Log(sqlstr, ui.FirstName, ui.LastName, ui.Email)
-	err = db.QueryRow(sqlstr, ui.FirstName, ui.LastName, ui.Email).Scan(&ui.ID)
+	// run query
+	row := db.QueryRow(sqlstr, ui.FirstName, ui.LastName, ui.Email)
+	if row == nil {
+		return ErrNilRow
+	}
+	err = row.Scan(&ui.ID)
 	if err != nil {
 		return err
 	}
@@ -111,11 +118,15 @@ func UserInfoByID(db DB, id int) (*UserInfo, error) {
 		`FROM public.user_info ` +
 		`WHERE id = $1`
 
-	// run query
 	Log(sqlstr, id)
-	ui := UserInfo{}
 
-	err = db.QueryRow(sqlstr, id).Scan(&ui.ID, &ui.FirstName, &ui.LastName, &ui.Email)
+	ui := UserInfo{}
+	// run query
+	row := db.QueryRow(sqlstr, id)
+	if row == nil {
+		return nil, ErrNilRow
+	}
+	err = row.Scan(&ui.ID, &ui.FirstName, &ui.LastName, &ui.Email)
 	if err != nil {
 		return nil, err
 	}
