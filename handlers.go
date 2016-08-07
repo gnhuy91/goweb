@@ -48,14 +48,16 @@ func UserHandler(db *DB) http.Handler {
 			}
 
 		case "POST":
-			var u models.UserInfo
+			var u models.User
+			u = models.NewUser()
+
 			err := json.NewDecoder(r.Body).Decode(&u)
 			if err != nil {
 				log.Println(err)
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-			if u == (models.UserInfo{}) {
+			if u == models.NewUser() {
 				http.Error(w, "user is empty", http.StatusBadRequest)
 				return
 			}

@@ -6,6 +6,17 @@ import (
 	"strings"
 )
 
+type User interface {
+	Insert(db DB) error
+	Update(db DB) error
+	Upsert(db DB) error
+	Delete(db DB) error
+}
+
+func NewUser() User {
+	return &UserInfo{}
+}
+
 // UserInfo represents a row from 'public.user_info'.
 type UserInfo struct {
 	ID        int    `db:"id,omitempty" json:"id,omitempty"`
