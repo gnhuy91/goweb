@@ -57,7 +57,14 @@ func UserHandler(db *DB) http.Handler {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 				return
 			}
-			if *u.(*models.UserInfo) == (models.UserInfo{}) {
+
+			// assert interface type to UserInfo struct
+			uu, ok := u.(*models.UserInfo)
+			if !ok {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			if *uu == (models.UserInfo{}) {
 				http.Error(w, "user is empty", http.StatusBadRequest)
 				return
 			}
