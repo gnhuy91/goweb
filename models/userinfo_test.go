@@ -19,6 +19,9 @@ type DB struct {
 // Pass to struct field function so that we can replace it later,
 // this is due to fact that struct fields can be replaced while
 // receiver methods cannot.
+// Use this trick when you want to change the mocked function's behavior
+// on the wire, ie. capturing mocked function's params which was computed
+// via previous calls.
 func (db *DB) Exec(query string, args ...interface{}) (sql.Result, error) {
 	return db.ExecFunc(query, args)
 }
@@ -40,19 +43,19 @@ func (db *DB) Prepare(query string) (*sql.Stmt, error) {
 }
 
 // Example Test to demonstrate struct methods mocking.
+// This test will verify the correctness of Insert's composed SQL query.
 func TestUserInsertQuery(t *testing.T) {
 	const outp = `INSERT INTO public.user_info (` +
 		`first_name, last_name, email` +
 		`) VALUES (` +
 		`$1, $2, $3` +
 		`) RETURNING id`
+	var q string
 
 	db := &DB{}
-	var q string
 	db.QueryRowFunc = func(query string, args ...interface{}) *sql.Row {
-		// capture sql query
+		// capture the query
 		q = query
-
 		return nil
 	}
 	// Insert user
