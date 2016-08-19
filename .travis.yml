@@ -1,6 +1,7 @@
 language: go
 
 sudo: required
+dist: trusty
 
 go:
   - 1.6
@@ -10,19 +11,13 @@ services:
   - postgresql
 
 addons:
-  apt:
-    sources:
-      - precise-pgdg-9.5
-    packages:
-      - postgresql-9.5
-      - postgresql-contrib-9.5
-  postgresql: 9.5
+  postgresql: "9.5"
 
 env:
   global:
+    - GO15VENDOREXPERIMENT=1
     - PGPORT=5433
     - PGHOST=localhost
-    - GO15VENDOREXPERIMENT=1
     - POSTGRES_HOST="$PGHOST:$PGPORT"
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=""
@@ -31,8 +26,6 @@ env:
 install: true
 
 before_script:
-  - sudo cp /etc/postgresql/9.4/main/pg_hba.conf /etc/postgresql/9.5/main/pg_hba.conf
-  - sudo /etc/init.d/postgresql restart
   - psql -c "create database $POSTGRES_DB;" -U "$POSTGRES_USER"
 
 script:
