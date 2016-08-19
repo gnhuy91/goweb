@@ -16,9 +16,6 @@ addons:
 env:
   global:
     - GO15VENDOREXPERIMENT=1
-    - PGPORT=5433
-    - PGHOST=localhost
-    - POSTGRES_HOST="$PGHOST:$PGPORT"
     - POSTGRES_USER=postgres
     - POSTGRES_PASSWORD=""
     - POSTGRES_DB=travis_ci_test
